@@ -1,8 +1,4 @@
-Will Be Available Soon
-================
-
-Still in Development
-================
+<b>Will Be Available Soon</b>
 
 <h1>BtitTracker v.1.5.1</h1>
 
