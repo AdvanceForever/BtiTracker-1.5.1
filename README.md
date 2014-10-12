@@ -1,5 +1,3 @@
-<b>Will Be Available Soon</b>
-
 <h1>BtitTracker v.1.5.1</h1>
 
 Installation
@@ -13,21 +11,25 @@ Installation
 
 Requirements
 ================
-1: Memcached Server
+
+1: PHP 5.3 > Above
 <br />
-2: Memcached Extension (Not to be confused with Memcache)
+2: Apache Web Server 2 > Above or NGINX
 <br />
-3: PHP 5.3 > Above
+3: MySql Server
 <br />
-4: Apache Web Server 2 > Above or NGINX
+4: Memcached Server
 <br />
-5: MySql Server
+5: Memcached Extension (Don't confuse it with Memcache Extension)
 <br />
 6: MySqli Extension
 <br />
-7: zlib
+7: igbinary
 <br />
 8: mbstring
 <br />
 9: gd2
-
+<br />
+10: zlib
+<br />
+11: APC
