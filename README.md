@@ -1,4 +1,4 @@
-<h1>BtitTracker v.1.5.1 (<span style="color:red;">Not Completed !</span>)</h1>
+<h1>BtitTracker v.1.5.1 (Not Completed !)</h1>
 
 Installation
 ================
