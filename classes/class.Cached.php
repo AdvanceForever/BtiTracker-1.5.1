@@ -143,5 +143,70 @@ class Cached {
            return $ret;
         }
 
+        public static function get_forum_access_levels($forumid) {
+           global $db;
+
+           MCached::connect();
+
+	   $key = 'forum::access::levels::' . $forumid;
+	   $arr = MCached::get($key);
+           if ($arr === MCached::NO_RESULT) {
+                $res = $db->query("SELECT minclassread, minclasswrite, minclasscreate FROM forums WHERE id = " . $forumid);
+    
+                if ($res->num_rows != 1)
+                     return false;
+    
+                $arr = $res->fetch_assoc();
+                MCached::add($key, $arr, self::SIX_HOURS);
+           }
+    
+           return array(
+              'read' => (int)$arr['minclassread'],
+              'write' => (int)$arr['minclasswrite'],
+              'create' => (int)$arr['minclasscreate']
+           );
+        }
+
+        public static function get_forum_last_post($forumid) {
+           global $db;
+
+           MCached::connect();
+
+	   $key = 'forum::last::post::' . $forumid;
+	   $arr = MCached::get($key);
+           if ($arr === MCached::NO_RESULT) {
+                $res = $db->query("SELECT lastpost FROM topics WHERE forumid = " . $forumid . " ORDER BY lastpost DESC LIMIT 1");
+                $arr = $res->fetch_row();
+                MCached::add($key, $arr, self::SIX_HOURS);
+           }
+    
+           $postid = (int)$arr[0];
+    
+           if ($postid)
+                return $postid;
+           else
+                return 0;
+        }
+
+        public static function get_topic_forum($topicid) {
+           global $db;
+
+           MCached::connect();
+
+	   $key = 'forum::id::' . $topicid;
+	   $arr = MCached::get($key);
+           if ($arr === MCached::NO_RESULT) {
+                $res = $db->query("SELECT forumid FROM topics WHERE id = " . $topicid);
+    
+                if ($res->num_rows != 1)
+                     return false;
+    
+                $arr = $res->fetch_row();
+                MCached::add($key, $arr, self::SIX_HOURS);
+           }
+    
+           return (int)$arr[0];
+        }
+
 }#End Class...
 ?>
