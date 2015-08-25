@@ -66,41 +66,5 @@ if (isset(user::$current) && user::$current && user::$current["uid"] > 1) {
 </tr>
 </table>
 <?php
-} else {
-    if (!isset($user))
-        $user = '';
-?>
-    <form action='login.php' name='login' method='post'>
-    <table class='lista' border='0' width='100%' cellpadding='2' cellspacing='0'>
-    <tr>
-    <td class='lista' align='left'>
-      <table border='0' cellpadding='2' cellspacing='0'>
-      <tr>
-      <td align='right' class='lista'><?php
-    echo USER_NAME;
-?>:</td>
-      <td class='lista'><input type='text' size='15' name='uid' value='<?php
-    $user;
-?>' maxlength='40' style='font-size:10px' /></td>
-      <td align='right' class='lista'><?php
-    echo USER_PWD;
-?>:</td>
-      <td class='lista'><input type='password' size='15' name='pwd' maxlength='40' style='font-size:10px' /></td>
-      <td class='lista' align='center'><input type='submit' value='<?php
-    echo FRM_LOGIN;
-?>' style='font-size:10px' /></td>
-      </tr>
-      </table>
-    </td>
-    <td class='lista' align='center'><a href='account.php'><?php
-    echo ACCOUNT_CREATE;
-?></a></td>
-    <td class='lista' align='center'><a href='recover.php'><?php
-    echo RECOVER_PWD;
-?></a></td>
-    </tr>
-    </table>
-    </form>
-    <?php
 }
 ?>
