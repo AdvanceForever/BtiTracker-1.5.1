@@ -105,7 +105,7 @@ EOD;
 	</tr>
     </table>
     <div id="foot">
-	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.0" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.0 by Yupy &amp; Btiteam</a></span>
+	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.1" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.1 by Yupy &amp; Btiteam</a></span>
 </div>
 <?php
 }
@@ -178,7 +178,7 @@ EOD;
 	</tr>
     </table>
     <div id="foot">
-	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.0" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.0 by Yupy &amp; Btiteam</a></span>
+	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.1" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.1 by Yupy &amp; Btiteam</a></span>
 </div>
 <?php
 } else {
@@ -245,7 +245,7 @@ EOD;
 	</tr>
     </table>
     <div id="foot">
-	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.0" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.0 by Yupy &amp; Btiteam</a></span>
+	<span><a href="http://www.btiteam.org" target="_blank">BtiTeam.org</a> | <a href="https://github.com/Yupy/BtiTracker-1.5.1" target="_blank">GitHub.com</a> | <a href="#">BtiTracker v1.5.1 by Yupy &amp; Btiteam</a></span>
 </div>
 </body>
 </html>
