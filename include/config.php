@@ -49,16 +49,16 @@ $GLOBALS['maxleech'] = 5;
 /////////// End of User Configuration ///////////
 $dbhost = 'localhost';
 $dbuser = 'root';
-$dbpass = 'yupynell';
+$dbpass = '';
 $database = 'btit';
 $salting = "sUBaswupeduchErEm3wEbec8etraNECa";
 //Tracker's name
 $SITENAME='BtiTracker 1.5.1';
 //Tracker's Base URL
-$BASEURL='http://188.173.166.16';
+$BASEURL='http://localhost';
 // tracker's announce urls, can be more than one
 $TRACKER_ANNOUNCEURLS=array();
-$TRACKER_ANNOUNCEURLS[]='http://188.173.166.16/announce.php';
+$TRACKER_ANNOUNCEURLS[]='http://localhost/announce.php';
 //Tracker's email (owner email)
 $SITEEMAIL='your@email.com';
 //Torrent's DIR
