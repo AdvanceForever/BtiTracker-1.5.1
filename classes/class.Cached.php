@@ -173,14 +173,14 @@ class Cached {
            MCached::connect();
 
 	   $key = 'forum::last::post::' . $forumid;
-	   $arr = MCached::get($key);
-           if ($arr === MCached::NO_RESULT) {
+	   $postid = MCached::get($key);
+           if ($postid === MCached::NO_RESULT) {
                 $res = $db->query("SELECT lastpost FROM topics WHERE forumid = " . $forumid . " ORDER BY lastpost DESC LIMIT 1");
                 $arr = $res->fetch_row();
-                MCached::add($key, $arr, self::SIX_HOURS);
+
+                $postid = (int)$arr[0];
+                MCached::add($key, $postid, self::SIX_HOURS);
            }
-    
-           $postid = (int)$arr[0];
     
            if ($postid)
                 return $postid;
