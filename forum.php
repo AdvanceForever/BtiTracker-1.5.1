@@ -1,9 +1,9 @@
 <?php
 /*
-* BtiTracker v1.5.0 is a php tracker system for BitTorrent, easy to setup and configure.
+* BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
 * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
 * Updated and Maintained by Yupy.
-* Copyright (C) 2004-2014 Btiteam.org
+* Copyright (C) 2004-2015 Btiteam.org
 */
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
 
