@@ -19,8 +19,7 @@ if (isset($_GET["action"]))
 else
     $action = "";
 
-function catch_up()
-{
+function catch_up() {
     global $db;
     
     $userid = user::$current["uid"];
@@ -44,76 +43,26 @@ function catch_up()
     }
 }
 
-//-------- Returns the minimum read/write class levels of a forum
-
-function get_forum_access_levels($forumid)
-{
-    global $db;
-
-    $res = $db->query("SELECT minclassread, minclasswrite, minclasscreate FROM forums WHERE id = " . $forumid) or sqlerr(__FILE__, __LINE__);
-    
-    if ($res->num_rows != 1)
-        return false;
-    
-    $arr = $res->fetch_assoc();
-    
-    return array(
-        "read" => (int)$arr["minclassread"],
-        "write" => (int)$arr["minclasswrite"],
-        "create" => (int)$arr["minclasscreate"]
-    );
-}
-
-//-------- Returns the forum ID of a topic, or false on error
-
-function get_topic_forum($topicid)
-{
-    global $db;
-
-    $res = $db->query("SELECT forumid FROM topics WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-    
-    if ($res->num_rows != 1)
-        return false;
-    
-    $arr = $res->fetch_row();
-    
-    return (int)$arr[0];
-}
-
 //-------- Returns the ID of the last post of a forum
 
-function update_topic_last_post($topicid)
-{
+function update_topic_last_post($topicid) {
     global $db;
 
+    MCached::connect();
+
     $res = $db->query("SELECT id FROM posts WHERE topicid = " . $topicid . " ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row() or die("No post found");
     
     $postid = (int)$arr[0];
     
     $db->query("UPDATE topics SET lastpost = " . $postid . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-}
 
-function get_forum_last_post($forumid)
-{
-    global $db;
-
-    $res = $db->query("SELECT lastpost FROM topics WHERE forumid = " . $forumid . " ORDER BY lastpost DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-    
-    $arr = $res->fetch_row();
-    
-    $postid = (int)$arr[0];
-    
-    if ($postid)
-        return $postid;
-    else
-        return 0;
+    MCached::del('forum::last::post::' . $topicid);
+    MCached::del('quick::jump::topics::' . $topicid);
 }
 
 //-------- Inserts a quick jump menu
-function insert_quick_jump_menu($currentforum = 0)
-{
+function insert_quick_jump_menu($currentforum = 0) {
     global $db;
 
     print("<p align='center'><form method='get' action='?' name='quickjump'>\n");
@@ -134,22 +83,29 @@ function insert_quick_jump_menu($currentforum = 0)
 }
 
 //-------- Inserts a compose frame
-function insert_compose_frame($id, $newtopic = true, $quote = false)
-{
+function insert_compose_frame($id, $newtopic = true, $quote = false) {
     global $maxsubjectlength, $db;
+
+    MCached::connect();
     
     if ($newtopic) {
-        $res = $db->query("SELECT name FROM forums WHERE id = " . $id) or sqlerr(__FILE__, __LINE__);
-        
-        $arr = $res->fetch_assoc() or die(BAD_FORUM_ID);
+        $arr = MCached::get('forums::name::' . $id);
+        if ($arr === MCached::NO_RESULT) {
+            $res = $db->query("SELECT name FROM forums WHERE id = " . $id) or sqlerr(__FILE__, __LINE__);
+            $arr = $res->fetch_assoc() or die(BAD_FORUM_ID);
+            MCached::add('forums::name::' . $id, $arr, 9600);
+        }
         
         $forumname = security::html_safe(unesc($arr["name"]));
         
         block_begin(WORD_NEW . " " . TOPIC . " " . IN . " <a href='?action=viewforum&forumid=" . $id . "'>" . $forumname . "</a> " . FORUM);
     } else {
-        $res = $db->query("SELECT * FROM topics WHERE id = " . $id) or sqlerr(__FILE__, __LINE__);
-        
-        $arr = $res->fetch_assoc() or stderr(ERROR, FORUM_ERROR . TOPIC_NOT_FOUND);
+        $arr = MCached::get('quick::jump::topics::' . $id);
+        if ($arr === MCached::NO_RESULT) {
+            $res = $db->query("SELECT * FROM topics WHERE id = " . $id) or sqlerr(__FILE__, __LINE__);
+            $arr = $res->fetch_assoc() or stderr(ERROR, FORUM_ERROR . TOPIC_NOT_FOUND);
+            MCached::add('quick::jump::topics::' . $id, $arr, 9600);
+        }
         
         $subject = security::html_safe(unesc($arr["subject"]));
         
@@ -273,7 +229,7 @@ if ($action == "post") {
     
     //------ Make sure sure user has write access in forum
     
-    $arr = get_forum_access_levels($forumid) or die(BAD_FORUM_ID);
+    $arr = Cached::get_forum_access_levels($forumid) or die(BAD_FORUM_ID);
     
     if (user::$current["id_level"] < $arr["write"] || ($newtopic && user::$current["id_level"] < $arr["create"]))
         stderr(ERROR, ERR_PERM_DENIED);
@@ -292,6 +248,9 @@ if ($action == "post") {
         $db->query("UPDATE forums SET topiccount = topiccount + 1 WHERE id = " . $forumid);
         
         $db->query("INSERT INTO topics (userid, forumid, subject) VALUES(" . $userid . ", " . $forumid . ", " . $subject . ")") or sqlerr(__FILE__, __LINE__);
+
+        MCached::del('forum::id::' . $topicid);
+        MCached::del('quick::jump::topics::' . $topicid);
         
         $topicid = $db->insert_id or stderr(ERROR, ERR_NO_TOPIC_ID);
     } else {
@@ -622,7 +581,7 @@ if ($action == "viewtopic") {
     if ($locked && user::$current["edit_forum"] != "yes")
         print("<p>" . TOPIC_LOCKED . "</p>\n");
     else {
-        $arr = get_forum_access_levels($forumid) or die;
+        $arr = Cached::get_forum_access_levels($forumid) or die;
         
         if (user::$current["id_level"] < $arr["write"])
             print("<p><i>" . ERR_LEVEL_CANT_POST . "</i></p>\n");
@@ -702,8 +661,11 @@ if ($action == "movetopic") {
     
     $arr = $res->fetch_assoc();
     
-    if ($arr["forumid"] != $forumid)
+    if ($arr["forumid"] != $forumid) {
         @$db->query("UPDATE topics SET forumid = " . $forumid . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+        MCached::del('forum::id::' . $topicid);
+        MCached::del('quick::jump::topics::' . $topicid);
+    }
     
     // modifying count topics & post
     $res = @$db->query("SELECT id FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
@@ -736,6 +698,10 @@ if ($action == "deletetopic") {
     $numtopic = $db->affected_rows;
     $db->query("DELETE FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
     $numposts = $db->affected_rows;
+
+    MCached::del('quick::jump::topics::' . $topicid);
+    MCached::del('forum::id::' . $topicid);
+    MCached::del('user::forum::posts::' . user::$current['uid']);
     
     $db->query("UPDATE forums SET topiccount = topiccount - " . $numtopic . ", postcount = postcount - " . $numposts . " WHERE id = " . $forumid);
     
@@ -891,6 +857,8 @@ if ($action == "locktopic") {
         die;
     
     $db->query("UPDATE topics SET locked = 'yes' WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+
+    MCached::del('quick::jump::topics::' . $topicid);
     
     redirect("forum.php?action=viewforum&forumid=" . $forumid . "&page=" . $page);
     die;
@@ -906,6 +874,8 @@ if ($action == "unlocktopic") {
         die;
     
     $db->query("UPDATE topics SET locked = 'no' WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+
+    MCached::del('quick::jump::topics::' . $topicid);
     
     redirect("forum.php?action=viewforum&forumid=" . $forumid . "&page=" . $page);
     die;
@@ -920,6 +890,8 @@ if ($action == "setlocked") {
     
     $locked = sqlesc($_POST["locked"]);
     $db->query("UPDATE topics SET locked = " . $locked . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+
+    MCached::del('quick::jump::topics::' . $topicid);
     
     redirect(addslashes($_POST['returnto']));
     die;
@@ -934,6 +906,8 @@ if ($action == "setsticky") {
     
     $sticky = sqlesc($_POST["sticky"]);
     $db->query("UPDATE topics SET sticky = " . $sticky . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+
+    MCached::del('quick::jump::topics::' . $topicid);
     
     redirect(addslashes($_POST['returnto']));
     die;
@@ -957,6 +931,8 @@ if ($action == 'renametopic') {
     $subject = sqlesc($subject);
     
     $db->query("UPDATE topics SET subject = " . $subject . " WHERE id = " . $topicid) or sqlerr();
+
+    MCached::del('quick::jump::topics::' . $topicid);
     
     $returnto = addslashes($_POST['returnto']);
     
@@ -1169,7 +1145,7 @@ if ($action == "viewforum") {
     
     print("</tr></table></p>\n");
     
-    $arr = get_forum_access_levels($forumid) or die;
+    $arr = Cached::get_forum_access_levels($forumid) or die;
     $maypost = user::$current["id_level"] >= $arr["write"] && user::$current["id_level"] >= $arr["create"];
     
     if (!$maypost)
@@ -1313,15 +1289,15 @@ if ($action == "search") {
             else
                 $pagemenu2 .= "<a href='forum.php?action=search&keywords=" . security::html_safe($keywords) . "&page=" . ($page + 1) . "'><b>" . NEXT . " &gt;&gt;</b></a>\n";
 
-			$offset = ($page * $perpage) - $perpage;
+            $offset = ($page * $perpage) - $perpage;
             $res = $db->query("SELECT id, topicid, userid, added FROM posts WHERE MATCH (body) AGAINST (" . $ekeywords . ") LIMIT " . $offset . ", " . $perpage) or sqlerr(__FILE__, __LINE__);
             $num = $res->num_rows;
 
-			print("<p align='center'>" . $pagemenu1 . "<br />" . $pagemenu2 . "</p>");
+	    print("<p align='center'>" . $pagemenu1 . "<br />" . $pagemenu2 . "</p>");
             print("<table class='lista' width='100%' border='1' bordercolor='#FFFFFF' cellspacing='0' cellpadding='5'>\n");
             print("<tr><td class='header'>" . POST . "</td><td class='header' align='left'>" . TOPIC . "</td><td class='header' align='left'>" . FORUM . "</td><td class='header' align='left'>" . AUTHOR . "</td></tr>\n");
 
-			for ($i = 0; $i < $num; ++$i) {
+	    for ($i = 0; $i < $num; ++$i) {
                 $post = $res->fetch_assoc();
                 $res2 = $db->query("SELECT forumid, subject FROM topics WHERE id = " . (int)$post['topicid']) or sqlerr(__FILE__, __LINE__);
                 $topic = $res2->fetch_assoc();
