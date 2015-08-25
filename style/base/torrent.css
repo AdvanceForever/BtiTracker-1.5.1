@@ -78,7 +78,7 @@ ul, ol {
 
 .columns.right {
     float: right;
-    margin-right: 6%;
+    margin-right: 10%;
 }
 
 .nine, .row .nine {
@@ -134,7 +134,7 @@ div#navContainer {
 }
 div#navContainer {
     position: fixed;
-    margin-left: 60px;
+    margin-left: 138px;
 }
 
 div#navArrowImg {
