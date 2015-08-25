@@ -8,7 +8,7 @@
 
 global $db;
 
-if (isset(user::$current) && user::$current && user::$current["uid"] > 1) {
+if (isset(user::$current) && user::$current && user::$current['uid'] > 1 && user::$current['style'] > 1) {
 ?>
 <table class='lista' cellpadding='2' cellspacing='0' width='100%'>
 <tr>
