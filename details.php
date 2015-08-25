@@ -61,7 +61,7 @@ if (!$row)
 
 $spacer = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
-print("<div align='center'><table class='lista' border='0' cellspacing='5' cellpadding='5'>\n");
+print("<div align='center'><table class='lista' width='100%' border='0' cellspacing='1' cellpadding='5'>\n");
 print("<tr><td align='right' class='header'> " . FILE_NAME);
 
 if (user::$current["uid"] > 1 && (user::$current["uid"] == $row["uploader"] || user::$current["edit_torrents"] == "yes" || user::$current["delete_torrents"] == "yes"))
