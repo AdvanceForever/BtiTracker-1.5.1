@@ -2011,6 +2011,8 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             $db->query("INSERT INTO forums SET name = " . $name . ", description = " . $description . ", minclassread = " . $minclassread . ", minclasswrite = " . $minclasswrite . ", minclasscreate = " . $minclasscreate);
         }
 
+        MCached::del('forum::access::levels::' . $id);
+
         redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=forum&action=read");
     } elseif ($do == "forum" && $action == "delete") {
         $id = intval($_GET["id"]);
