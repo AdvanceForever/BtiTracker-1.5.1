@@ -2012,6 +2012,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         }
 
         MCached::del('forum::access::levels::' . $id);
+        MCached::del('forums::name::' . $id);
 
         redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=forum&action=read");
     } elseif ($do == "forum" && $action == "delete") {
@@ -2022,6 +2023,8 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         if ($_GET["confirm"] == 1) {
             $db->query("DELETE FROM topics WHERE forumid = " . $id);
             $db->query("DELETE FROM forums WHERE id = " . $id);
+
+            MCached::del('forums::name::' . $id);
 
             redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=forum&action=read");
             exit();
