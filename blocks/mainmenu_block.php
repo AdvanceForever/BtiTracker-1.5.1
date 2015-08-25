@@ -51,7 +51,7 @@ $tpl->assign('is_guest', $is_guest);
 $is_guest1 = (user::$current['uid'] == 1);
 $tpl->assign('is_guest1', $is_guest1);
 
-$cur_username = user::$current['username'];
+$cur_username = user::$current['prefixcolor'] . user::$current['username'] . user::$current['suffixcolor'];
 $tpl->assign('cur_username', $cur_username);
 
 $logout_salt = md5("R45eOMs15mNd3yV" . user::$current['username']);
