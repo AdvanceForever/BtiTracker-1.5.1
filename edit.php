@@ -11,25 +11,21 @@ dbconn();
 
 standardheader('Edit Torrents');
 
-$scriptname = $_SERVER["PHP_SELF"];
-$link = $_GET["returnto"];
+$scriptname = security::esc_url($_SERVER["PHP_SELF"]);
+$link = unesc($_GET["returnto"]);
 
 if ($link == "")
     $link = "details.php?id=" . $row["info_hash"];
 
-if ((isset($_POST["comment"])) && (isset($_POST["name"])))
-{
-    if ($_POST["action"] == FRM_CONFIRM)
-	{
-        if ($_POST["name"] == '')
-        {
+if ((isset($_POST["comment"])) && (isset($_POST["name"]))) {
+    if ($_POST["action"] == FRM_CONFIRM) {
+        if ($_POST["name"] == '') {
             err_msg("Error!", "You must specify torrent name.");
             stdfoot();
             exit;
         }
 
-        if ($_POST["comment"] == '')
-        {
+        if ($_POST["comment"] == '') {
             err_msg("Error!","You must specify description.");
             stdfoot();
             exit;
@@ -41,8 +37,8 @@ if ((isset($_POST["comment"])) && (isset($_POST["name"])))
         echo "<center>".PLEASE_WAIT."</center>";
 
         $db->query("UPDATE namemap SET filename = " . $fname . ", comment = '" . $db->real_escape_string(AddSlashes($_POST["comment"])) . "', category = " . intval($_POST["category"]) . " WHERE info_hash = '" . $torhash . "'");
-        
-        @unlink(CACHE_PATH . 'torrent_details_' . $torhash . '.txt');
+
+        MCached::del('torrent::details::' . $torhash);
 	
 	print("<script language='javascript'>window.location.href='" . $link . "'</script>");
         exit();
@@ -53,8 +49,7 @@ if ((isset($_POST["comment"])) && (isset($_POST["name"])))
 }
 
 // view torrent's details
-if (isset($_GET["info_hash"]))
-{
+if (isset($_GET["info_hash"])) {
     $query = "SELECT namemap.info_hash, namemap.filename, namemap.url, UNIX_TIMESTAMP(namemap.data) AS data, namemap.size, namemap.comment, namemap.category AS cat_name, summary.seeds, summary.leechers, summary.finished, summary.speed, namemap.uploader FROM namemap LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN summary ON summary.info_hash = namemap.info_hash WHERE namemap.info_hash = '" . AddSlashes($_GET["info_hash"]) . "'";
     $res = $db->query($query) or die(CANT_DO_QUERY);
     $results = $res->fetch_array(MYSQLI_BOTH);
@@ -64,8 +59,7 @@ if (isset($_GET["info_hash"]))
     else {
         block_begin(EDIT_TORRENT);
 
-        if (!user::$current || (user::$current["edit_torrents"] == "no" && user::$current["uid"] != $results["uploader"]))
-        {
+        if (!user::$current || (user::$current["edit_torrents"] == "no" && user::$current["uid"] != $results["uploader"])) {
             err_msg(ERROR, CANT_EDIT_TORR);
             block_end();
             stdfoot();
