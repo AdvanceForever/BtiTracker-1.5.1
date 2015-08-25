@@ -1,17 +1,169 @@
 body {
-    font-family: "tahoma", "arial", "helvetica", "sans-serif";
-    font-size: 8pt;
-    background-color: #FAFCFE;
-    scrollbar-face-color: #DCE7F1;
-    scrollbar-highlight-color: #FFFFFF;
-    scrollbar-shadow-color: #FFFFFF;
-    scrollbar-3dlight-color: #FFFFFF;
-    scrollbar-arrow-color:  #006699;
-    scrollbar-track-color: #FFFFFF;
-    scrollbar-darkshadow-color: #FFFFFF;
+    font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    background-image: url(images/bg.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #FFF;
 }
-a:link,a:active,a:visited { color : #006699; }
-a:hover        { text-decoration: underline; color : #DD6900; }
+
+#new-message {
+   border-radius: 2px 2px 2px 2px;
+   -moz-border-radius: 2px 2px 2px 2px;
+   -webkit-border-radius: 2px 2px 2px 2px;
+   border: 0px solid #000000;
+   background-color: red;
+   text-align: center;
+   position: absolute;
+   min-width: 14px;
+   max-width: 20px;
+   margin-left: -8px;
+}
+
+.block_head {
+    background: #121212 none repeat scroll 0% 0%;
+    position: relative;
+    z-index: 1;
+    border: 1px solid #2A2A2A;
+    margin: 0px 0px 5px;
+    padding: 4px;
+}
+
+td.bord {
+   border: 1px solid #121212;
+}
+
+#mainNavigation ul {
+    margin: 0px;
+}
+ul, ol {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 17px;
+    list-style-position: inside;
+    color: #CCC;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+
+#mainNavigation ul li {
+    list-style: outside none none;
+    border-bottom: 1px solid #343434;
+    width: 100%;
+    padding: 0px 0px 0px 10px;
+    font-family: "PT Sans Narrow",sans-serif;
+    font-weight: normal;
+    margin-top: 6px;
+    margin-left:-26px;
+    text-transform: uppercase;
+}
+
+#logo {
+    position: relative;
+}
+
+.logo {
+    margin-bottom: 10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+#mainContainer {
+    overflow: hidden;
+    z-index: 2;
+    min-height: 100%;
+}
+
+.columns.right {
+    float: right;
+    margin-right: 6%;
+}
+
+.nine, .row .nine {
+    width: 75%;
+}
+
+.container {
+    background-image: url(images/content_back.png);
+    width: 820px;
+    margin-top:-16px;
+}
+
+.back {
+    z-index: 0;
+}
+
+.container {
+    background-position: center center;
+    border-bottom: medium none;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 14px;
+    bottom: 0px;
+    z-index: 2 !important;
+}
+}
+
+.row {
+    width: 1000px;
+    max-width: 100%;
+    min-width: 768px;
+    margin: 0px auto;
+}
+
+.row .row {
+    width: auto;
+    max-width: none;
+    min-width: 0px;
+    margin: 0px -15px;
+}
+
+.block_border {
+    border-bottom: 1px solid #434343;
+    margin: 5px 0px 20px;
+}
+
+div#navContainer {
+    top: 0px;
+    max-width: 240px;
+    width: 25%;
+    z-index: 3;
+
+}
+div#navContainer {
+    position: fixed;
+    margin-left: 60px;
+}
+
+div#navArrowImg {
+    position: absolute;
+    width: 100%;
+}
+
+div#navRepeatPart {
+    width: 100%;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+#bgRepeat, #bgRepeat img {
+    height: 100%;
+    width: 100%;
+}
+#bgRepeat {
+    position: absolute;
+    overflow: hidden;
+}
+
+div#mainNavigation {
+    position: relative;
+    padding: 0px 30px;
+}
+
+a:link,a:active,a:visited { text-decoration: none; color: #FFF; }
+a:hover        { text-decoration: none; color: #126892; }
 
 h1 {
     font-size: 12pt;
@@ -50,8 +202,6 @@ p.browse_changepage
 /* Pager End */
 
 table.lista {
-    background-color: #FAFCFE;
-    border: 1px #3939AA solid;
 }
 
 td.block {
@@ -74,8 +224,7 @@ td.blocklist {
 }
 
 td.lista {
-    background-color:#E0ECF7;
-    color : #006699;
+    color : #FFFFFF;
     font-size: 8pt;
 }
 
@@ -87,8 +236,7 @@ td.header {
            color:#3A4F6C;
            padding:7px;
            margin:0px;
-           background-color: #3860BB;
-           background-image: url(header_back.gif);
+           background-color: #121212;
 }
 
 td.title {

@@ -28,7 +28,7 @@ if (user::$current['view_users'] != 'yes') {
 }
 
 if ($id > 1) {
-    $res = $db->query("SELECT users.cip, UNIX_TIMESTAMP(users.joined) AS joined, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, users_level.level, countries.name, countries.flagpic, users.pid, users.time_offset FROM users INNER JOIN users_level ON users_level.id = users.id_level LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $id);
+    $res = $db->query("SELECT users.cip, UNIX_TIMESTAMP(users.joined) AS joined, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, users_level.level, users_level.prefixcolor, users_level.suffixcolor, countries.name, countries.flagpic, users.pid, users.time_offset FROM users INNER JOIN users_level ON users_level.id = users.id_level LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $id);
     $num = $res->num_rows;
 
     #Stats Upped, Downed, etc...

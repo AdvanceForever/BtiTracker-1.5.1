@@ -1,5 +1,7 @@
     </td>
-    <?php right_menu(); ?>
+    <?php //right_menu(); ?>
 </tr>
 </table>
+
+
 </table>

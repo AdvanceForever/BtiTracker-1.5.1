@@ -1,9 +1,9 @@
 <?php
 /*
-* BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
+* BtiTracker v1.5.0 is a php tracker system for BitTorrent, easy to setup and configure.
 * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
 * Updated and Maintained by Yupy.
-* Copyright (C) 2004-2015 Btiteam.org
+* Copyright (C) 2004-2014 Btiteam.org
 */
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
 
@@ -1391,7 +1391,7 @@ $forums_res = $db->query("SELECT * FROM forums ORDER BY sort, name") or sqlerr(_
 
 block_begin(FORUMS);
 
-print("<table class='lista' border='1' width='100%' cellspacing='0' cellpadding='5' bordercolor='#FFFFFF'>\n");
+print("<table class='lista' border='0' width='100%' cellspacing='1' cellpadding='5'>\n");
 
 print("<tr><td class='header' align='center'>" . FORUM . "</td><td class='header' align='center' width='15%'>" . TOPICS . "</td>" . "<td class='header' align='center' width='15%'>" . POSTS . "</td>" . "<td class='header' align='center' width='15%'>" . LASTPOST . "</td></tr>\n");
 
