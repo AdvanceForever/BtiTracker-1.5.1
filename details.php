@@ -49,16 +49,11 @@ $res = $db->query("SELECT namemap.info_hash, namemap.url, UNIX_TIMESTAMP(namemap
 $row = $res->fetch_array(MYSQLI_BOTH);
 
 #Cached filename, size and description...
-$cache_details = CACHE_PATH . 'torrent_details_' . $id . '.txt';
-$cache_details_expire = 7 * 3600;
-if (file_exists($cache_details) && is_array(unserialize(file_get_contents($cache_details))) && (vars::$timestamp - filemtime($cache_details)) < $cache_details_expire) {
-    $cache = unserialize(@file_get_contents($cache_details));
-} else {
+$cache = MCached::get('torrent::details::' . $id);
+if ($cache === MCached::NO_RESULT) {
     $cached = $db->query("SELECT filename, size, comment FROM namemap WHERE info_hash = '" . $id . "'");
     $cache = $cached->fetch_assoc();
-    $handle = fopen($cache_details, "w+");
-    fwrite($handle, serialize($cache));
-    fclose($handle);
+    MCached::add('torrent::details::' . $id, $cache, 43200);
 }
 
 if (!$row)
