@@ -33,10 +33,10 @@ if (isset($_GET["search"])) {
 <form action='<?php $scriptname;?>' method='get'>
    <table border='0' class='lista' align='center'>
    <tr>
-   <td class='block'><?php echo TORRENT_SEARCH;?></td>
-   <td class='block'><?php echo CATEGORY_FULL;?></td>
-   <td class='block'><?php echo TORRENT_STATUS;?></td>
-   <td class='block'>&nbsp;</td>
+   <td class='header'><?php echo TORRENT_SEARCH;?></td>
+   <td class='header'><?php echo CATEGORY_FULL;?></td>
+   <td class='header'><?php echo TORRENT_STATUS;?></td>
+   <td class='header'>&nbsp;</td>
    </tr>
    <tr>
    <td><input type='text' name='search' size='30' maxlength='50' value='<?php $trova;?>'></td>
@@ -172,7 +172,7 @@ else
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=cname&amp;by=" . ($order == "cname" && $by == "ASC" ? "DESC" : "ASC") . "'>" . CATEGORY . "</a>" . ($order == "cname" ? $mark : ""); ?></td>
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=filename&amp;by=" . ($order == "filename" && $by == "ASC" ? "DESC" : "ASC") . "'>" . FILE . "</a>" . ($order == "filename" ? $mark : ""); ?></td>
 <td align='center' class='header'><?php echo COMMENT; ?></td>
-<td align='center' class='header'><?php echo RATING; ?></td>
+<!--<td align='center' class='header'><?php echo RATING; ?></td>-->
 <?php
 if (user::$current["WT"] > 0)
     print("<td align='center' class='header'>" . WT . "</td>");
@@ -189,7 +189,7 @@ if ($SHOW_UPLOADER)
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=finished&amp;by=" . ($order == "finished" && $by == "ASC" ? "DESC" : "ASC")."'>" . SHORT_C . "</a>" . ($order == "finished" ? $mark : ""); ?></td>
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=dwned&amp;by=" . ($order == "dwned" && $by == "ASC" ? "DESC" : "ASC")."'>" . DOWNLOADED . "</a>" . ($order == "dwned" ? $mark : ""); ?></td>
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=speed&amp;by=" . ($order == "speed" && $by == "ASC" ? "DESC" : "ASC")."'>" . SPEED . "</a>" . ($order == "speed" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo AVERAGE; ?></td>
+<!--<td align='center' class='header'><?php echo AVERAGE; ?></td>-->
 </tr>
 <tr>
 
@@ -233,6 +233,7 @@ if ($count) {
 	    echo "\t<td align='center' class='lista'>---</td>";
 
     // Rating
+    /* Uncomment to show rating on torrents page...
     $vres = $db->query("SELECT SUM(rating) AS totrate, COUNT(*) AS votes FROM ratings WHERE infohash = '" . $db->real_escape_string($data["hash"]) . "'");
     $vrow = @$vres->fetch_array(MYSQLI_BOTH);
 
@@ -263,6 +264,7 @@ if ($count) {
         $totrate = NA;
 
     echo "\t<td align='center' class='lista'>" . $totrate . "</td>\n";
+    */
     // end rating
 
     //waitingtime
@@ -350,6 +352,7 @@ if ($count) {
     }
 
     // progress
+    /*
     if ($data["external"] == "yes")
         $prgsf = floor((((int)$data["seeds"]) / ((int)$data["leechers"] > 0 ? (int)$data["leechers"] : 1)) * 100) . " %";
     else {
@@ -372,6 +375,7 @@ if ($count) {
         $prgsf .= "%";
     }
     print("<td align='center' class='lista'>" . $prgsf . "</td>");
+   */
 
     echo "</tr>\n";
     $i++;
