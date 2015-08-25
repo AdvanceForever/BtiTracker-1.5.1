@@ -225,7 +225,7 @@ if ($action == "post") {
         if (strlen($subject) > $maxsubjectlength)
             stderr(ERROR, SUBJECT_MAX_CHAR . " " . $maxsubjectlength . " " . CHARACTERS);
     } else
-        $forumid = get_topic_forum($topicid) or die(ERR_TOPIC_ID);
+        $forumid = Cached::get_topic_forum($topicid) or die(ERR_TOPIC_ID);
     
     //------ Make sure sure user has write access in forum
     
@@ -1385,7 +1385,7 @@ while ($forums_arr = $forums_res->fetch_assoc()) {
     $postcount = number_format((int)$forums_arr["postcount"]);
     
     // Find last post ID
-    $lastpostid = get_forum_last_post($forumid);
+    $lastpostid = Cached::get_forum_last_post($forumid);
     
     // Get last post info
     $post_res = $db->query("SELECT added, topicid, userid FROM posts WHERE id = " . $lastpostid) or sqlerr(__FILE__, __LINE__);
