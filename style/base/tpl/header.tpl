@@ -55,7 +55,7 @@
 
        </div>
        <div id='navArrowImg'>
-          <span style='position:absolute;'><img style='margin-top:50px; margin-left: 103px;' src='images/logout.png' title='Logout' alt='Logout'></span>
+          <span style='position:absolute;'><a href='logout.php?check_hash={$logout_salt}'><img style='margin-top:50px; margin-left: 103px;' src='images/logout.png' title='Logout' alt='Logout'></a></span>
           <img src='style/base/images/menu_down.png' height='130' width='100%'>
        </div>
     </td>
