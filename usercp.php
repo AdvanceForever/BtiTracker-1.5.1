@@ -591,6 +591,7 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
 
                     MCached::del('user::profile::' . $uid);
                     MCached::del('user::cp::' . $uid);
+                    MCached::del('forum::poster::details::' . $uid);
                     MCached::del('style::list');
                     MCached::del('language::list');
                     MCached::del('flag::list');
