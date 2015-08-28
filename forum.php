@@ -446,10 +446,12 @@ if ($action == "viewtopic") {
         $added = get_date_time($arr["added"]) . "<br />(" . (get_elapsed_time(($arr["added"]))) . " ago)";
         
         //---- Get poster details
-        
-        $res2 = $db->query("SELECT username, level, avatar, uploaded, downloaded, name, flagpic FROM users INNER JOIN users_level ON users.id_level = users_level.id LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $posterid) or sqlerr(__FILE__, __LINE__);
-        
-        $arr2 = $res2->fetch_assoc();
+        $arr2 = MCached::get('forum::poster::details::' . $posterid);
+        if ($arr2 === MCached::NO_RESULT) {
+            $res2 = $db->query("SELECT username, level, avatar, uploaded, downloaded, name, flagpic FROM users INNER JOIN users_level ON users.id_level = users_level.id LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $posterid) or sqlerr(__FILE__, __LINE__);
+            $arr2 = $res2->fetch_assoc();
+            MCached::add('forum::poster::details::' . $posterid, $arr2, 1800);
+        }
         
         $postername = security::html_safe($arr2["username"]);
         
