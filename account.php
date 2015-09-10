@@ -680,6 +680,9 @@ function modificautente() {
     
     if ($updateset != "")
         @$db->query("UPDATE users SET " . $updateset . " WHERE username = '" . $oldname . "'");
+        
+    MCached::del('current::user::' . (int)$_POST['uid']);
+    MCached::del('user::profile::' . (int)$_POST['uid']);
     
     write_log("Modified User " . $utente . "", "modify");
 }
