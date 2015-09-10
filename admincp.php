@@ -2192,10 +2192,50 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         
         print("<br />\n<table border='0'>\n");
         print("<tr><td>Server's OS:</td><td>" . php_uname() . "</td></tr>");
+
+        #Memcached Stats...
+        MCached::connect();
+        $stats = MCached::stats();
+        foreach ($stats as $server => $stat) {
+	    $usertime = 0 + ''.$stat['rusage_user_seconds'].'.'.$stat['rusage_user_microseconds'];
+	    $systime = 0 + ''.$stat['rusage_system_seconds'].'.'.$stat['rusage_system_microseconds'];
+	    print("<tr>
+               <td valign='top'>Memcached Stats:</td>
+               <td>Server: " . $server . " (" . $stat['version'] . " " . $stat['pointer_size'] . " bit)
+               <br />
+               PID: " . $stat['pid'] . "
+               <br />
+               Threads: " . $stat['threads'] . "
+               <br />
+	       CPU Time: " . round($usertime, 4) . "s User / " . round($systime, 4) . "s System / " . round($systime + $usertime, 4) . "s Total
+               <br />
+	       Network I/O: " . misc::makesize($stat['bytes_read']) . " / " . misc::makesize($stat['bytes_written']) . "
+               <br />
+	       Network Connections: " . number_format($stat['curr_connections']) . " / " . number_format($stat['total_connections']) . "
+               <br />
+	       Items: " . number_format($stat['curr_items']) . " / " . number_format($stat['total_items']) . "
+               <br />
+	       Size: " . misc::makesize($stat['bytes']) . " / " . misc::makesize($stat['limit_maxbytes']) . "
+               <br />
+	       Gets: " . number_format($stat['cmd_get']) . "
+               <br />
+	       Sets: " . number_format($stat['cmd_set']) . "
+               <br />
+	       Hits: " . number_format($stat['get_hits']) . "
+               <br />
+	       Misses: " . number_format($stat['get_misses']) . "
+               <br />
+	       Evictions: " . number_format($stat['evictions']) . "
+               <br />
+	       Hit Rate: " . round(($stat['get_hits'] / $stat['cmd_get']) * 100, 2) . "%
+	       </td>
+	    </tr>");
+        }
+
         print("<tr><td>PHP Version:</td><td>" . phpversion() . "</td></tr>");
 
         $sqlver = $db->query("SELECT VERSION()");
-		$sqlver = $sqlver->fetch_row();
+	$sqlver = $sqlver->fetch_row();
 
         print("\n<tr><td>MYSQL Version:</td><td>" . $sqlver[0] . "</td></tr>");
         $sqlver = $db->stat();
