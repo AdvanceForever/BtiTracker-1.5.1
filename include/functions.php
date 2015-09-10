@@ -383,106 +383,13 @@ function hash_pad($hash) {
     return str_pad($hash, 20);
 }
 
-function userlogin() {
-    global $db, $tpl;
-    unset($GLOBALS['CURUSER']);
-    
-    require_once(CLASS_PATH . 'class.Cached.php');
-    
-    $ip  = vars::$ip;
-    $nip = ip2long($ip);
-    $ipf = vars::$realip;
-    
-    #Check if User is Banned...
-    #if (!($row['flags'] & BIT_26)) -- TO-DO
-	#$banned = false;
-
-        if (Cached::bans($ip, $reason))
-            $banned = true;
-        else {
-            if ($ip != $ipf) {
-                if (Cached::bans($ipf, $reason))
-                    $banned = true;
-            }
-        }
-        if ($banned) {
-            header('Content-Type: text/html; charset=utf-8');
-
-            $banned_message = security::html_safe($reason);
-	    $tpl->assign('banned_message', $banned_message);
-
-	    $banned_msg = $tpl->draw('style/base/tpl/banned_message', $return_string = true);
-            echo $banned_msg;
-
-            die;
-        } #End Banned User...
-    
-    // guest
-    if (empty($_COOKIE["uid"]) || empty($_COOKIE["pass"]))
-        $id = 1;
-    
-    if (!isset($_COOKIE["uid"]) && _string::is_hex($_COOKIE["uid"]))
-        $_COOKIE["uid"] = 1;
-
-    $id = max(1, (int)$_COOKIE["uid"]);
-
-    // it's guest
-    if (!$id)
-        $id = 1;
-    
-    $res = $db->query("SELECT users.pid, users.topicsperpage, users.postsperpage, users.torrentsperpage, users.flag, users.avatar, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, UNIX_TIMESTAMP(users.joined) AS joined, users.id AS uid, users.username, users.password, users.loginhash, users.random, users.email, users.language, users.style, users.time_offset, users_level.* 
-	    FROM users INNER JOIN users_level ON users.id_level = users_level.id 
-		WHERE users.id = " . $id);
-    $row = $res->fetch_array(MYSQLI_BOTH);
-    
-    user::prepare_user($row);
-    
-    if (!$row) {
-        $id  = 1;
-        $res = $db->query("SELECT users.topicsperpage, users.postsperpage, users.torrentsperpage, users.flag, users.avatar, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, UNIX_TIMESTAMP(users.joined) AS joined, users.id AS uid, users.username, users.password, users.loginhash, users.random, users.email, users.language, users.style, users.time_offset, users_level.* 
-		    FROM users INNER JOIN users_level ON users.id_level = users_level.id WHERE users.id = 1");
-        $row = $res->fetch_array(MYSQLI_BOTH);
-    }
-	
-    if (!isset($_COOKIE["pass"]))
-        $_COOKIE["pass"] = "";
-	
-    if (($_COOKIE["pass"] != md5($GLOBALS["salting"] . $row["random"] . $row["password"] . $row["random"])) && $id != 1) {
-        $id  = 1;
-        $res = $db->query("SELECT users.topicsperpage, users.postsperpage, users.torrentsperpage, users.flag, users.avatar, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, UNIX_TIMESTAMP(users.joined) AS joined, users.id AS uid, users.username, users.password, users.loginhash, users.random, users.email, users.language, users.style, users.time_offset, users_level.* 
-		    FROM users INNER JOIN users_level ON users.id_level = users_level.id 
-			WHERE users.id = 1");
-        $row = $res->fetch_array(MYSQLI_BOTH);
-    }
-    
-    #Hide Staff IP's by Yupy...
-    $hide_ips = array(
-        "Moderator" => 6,
-        "Administrator" => 7,
-        "Owner" => 8
-    ); // Staff ID level's 
-    
-    $ip = ($row["id_level"] <> $hide_ips["Moderator"]) ? $ip : "127.0.0.1";
-    $ip = ($row["id_level"] <> $hide_ips["Administrator"]) ? $ip : "127.0.0.1";
-    $ip = ($row["id_level"] <> $hide_ips["Owner"]) ? $ip : "127.0.0.1";
-    
-    if ($id > 1)
-        $db->query("UPDATE users SET lastconnect = NOW(), lip = " . $nip . ", cip = '" . AddSlashes($ip) . "' WHERE id = " . $id);
-    else
-        $db->query("UPDATE users SET lastconnect = NOW(), lip = 0, cip = NULL WHERE id = 1");
-    
-    user::$current = $row;
-    $GLOBALS['CURUSER'] =& user::$current;
-    unset($row);
-}
-
 function dbconn($do_clean = false) {
     global $dbhost, $dbuser, $dbpass, $database, $HTTP_SERVER_VARS, $db;
     
     /*
      * Connect to Database.
      */
-    if ($GLOBALS["persist"])
+    if ($GLOBALS['persist'])
         $db = new mysqli($dbhost, $dbuser, $dbpass, $database);
     else
         $db = new mysqli($dbhost, $dbuser, $dbpass, $database);
@@ -491,10 +398,10 @@ function dbconn($do_clean = false) {
         die('Connect Error (' . $db->connect_errno . ') ' . $db->connect_error);
     }
     
-    userlogin();
+    user::login();
     
     if ($do_clean)
-        register_shutdown_function("cleandata");
+        register_shutdown_function('cleandata');
 }
 
 function cleandata() {
