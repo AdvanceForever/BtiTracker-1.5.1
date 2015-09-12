@@ -21,6 +21,7 @@ if ($action == "prune") {
             continue;
         @$db->query("DELETE FROM users WHERE id = '" . $uid . "'");
         MCached::del('current::user::' . $uid);
+        MCached::del('user::profile::' . $uid);
         $count++;
     }
     block_begin("Pruned users");
