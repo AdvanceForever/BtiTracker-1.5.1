@@ -28,7 +28,7 @@ if (user::$current['view_users'] != 'yes') {
 }
 
 if ($id > 1) {
-    $res = $db->query("SELECT users.cip, UNIX_TIMESTAMP(users.joined) AS joined, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, users_level.level, users_level.prefixcolor, users_level.suffixcolor, countries.name, countries.flagpic, users.pid, users.time_offset FROM users INNER JOIN users_level ON users_level.id = users.id_level LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $id);
+    $res = $db->query("SELECT users.cip, UNIX_TIMESTAMP(users.lastconnect) AS lastconnect, users_level.level, users_level.prefixcolor, users_level.suffixcolor, countries.name, countries.flagpic, users.pid, users.time_offset FROM users INNER JOIN users_level ON users_level.id = users.id_level LEFT JOIN countries ON users.flag = countries.id WHERE users.id = " . $id);
     $num = $res->num_rows;
 
     #Stats Upped, Downed, etc...
@@ -44,7 +44,7 @@ if ($id > 1) {
     #Other...
     $get_user = MCached::get('user::profile::' . $id);
     if ($get_user === MCached::NO_RESULT) {
-        $user = $db->query('SELECT avatar, email, username, flag FROM users WHERE id = ' . $id);
+        $user = $db->query('SELECT avatar, email, username, UNIX_TIMESTAMP(joined) AS joined, flag FROM users WHERE id = ' . $id);
         $get_user = $user->fetch_assoc();
         $get_user['avatar'] = (string)$get_user['avatar'];
         $get_user['email'] = (string)$get_user['email'];
@@ -104,7 +104,7 @@ if (user::$current["edit_users"] == "yes" || user::$current["admin_access"] == "
   $colspan = '';
 }
 
-print("<tr>\n<td class='header'>".USER_JOINED."</td>\n<td class='lista'".$colspan.">".($row["joined"] == 0 ? "N/A" : get_date_time($row["joined"]))."</td></tr>\n");
+print("<tr>\n<td class='header'>".USER_JOINED."</td>\n<td class='lista'".$colspan.">".($get_user["joined"] == 0 ? "N/A" : get_date_time($get_user["joined"]))."</td></tr>\n");
 print("<tr>\n<td class='header'>".USER_LASTACCESS."</td>\n<td class='lista'".$colspan.">".($row["lastconnect"] == 0 ? "N/A" : get_date_time($row["lastconnect"]))."</td></tr>\n");
 print("<tr>\n<td class='header'>".PEER_COUNTRY."</td>\n<td class='lista' colspan='2'>".($get_user["flag"] == 0 ? "" : unesc($row['name']))."&nbsp;&nbsp;<img src='images/flag/".(!$row["flagpic"] || $row["flagpic"] == "" ? "unknown.gif" : $row["flagpic"])."' alt='".($get_user["flag"] == 0 ? "Unknown" : unesc($row['name']))."' /></td></tr>\n");
 
