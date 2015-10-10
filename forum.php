@@ -1,11 +1,11 @@
 <?php
 /*
-* BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
-* This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
-* Updated and Maintained by Yupy.
-* Copyright (C) 2004-2015 Btiteam.org
-*/
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
+ * BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
+ * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
+ * Updated and Maintained by Yupy.
+ * Copyright (C) 2004-2015 Btiteam.org
+ */
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR . 'functions.php');
 
 dbconn();
 
@@ -25,10 +25,9 @@ function catch_up() {
     $userid = user::$current["uid"];
     
     $res = $db->query("SELECT id, lastpost FROM topics");
-    
     while ($arr = $res->fetch_assoc()) {
         $topicid = (int)$arr["id"];
-        $postid = (int)$arr["lastpost"];
+        $postid  = (int)$arr["lastpost"];
         
         $r = $db->query("SELECT id, lastpostread FROM readposts WHERE userid = " . $userid . " AND topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
         
@@ -36,7 +35,7 @@ function catch_up() {
             $db->query("INSERT INTO readposts (userid, topicid, lastpostread) VALUES(" . $userid . ", " . $topicid . ", " . $postid . ")") or sqlerr(__FILE__, __LINE__);
         else {
             $a = $r->fetch_assoc();
-
+            
             if ($a["lastpostread"] < $postid)
                 $db->query("UPDATE readposts SET lastpostread = " . $postid . " WHERE id = " . (int)$a["id"]) or sqlerr(__FILE__, __LINE__);
         }
@@ -47,16 +46,17 @@ function catch_up() {
 
 function update_topic_last_post($topicid) {
     global $db;
-
+    
     MCached::connect();
-
+    
     $res = $db->query("SELECT id FROM posts WHERE topicid = " . $topicid . " ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
     $arr = $res->fetch_row() or die("No post found");
     
     $postid = (int)$arr[0];
     
     $db->query("UPDATE topics SET lastpost = " . $postid . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('forum::last::post::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
 }
@@ -64,11 +64,9 @@ function update_topic_last_post($topicid) {
 //-------- Inserts a quick jump menu
 function insert_quick_jump_menu($currentforum = 0) {
     global $db;
-
+    
     print("<p align='center'><form method='get' action='?' name='quickjump'>\n");
-    
     print("&nbsp;" . QUICK_JUMP . ": ");
-    
     print("<select name='forumid' onchange=\"location.href=this.options[this.selectedIndex].value\">\n");
     
     $res = $db->query("SELECT id, name, minclassread FROM forums ORDER BY sort, name") or sqlerr(__FILE__, __LINE__);
@@ -85,7 +83,7 @@ function insert_quick_jump_menu($currentforum = 0) {
 //-------- Inserts a compose frame
 function insert_compose_frame($id, $newtopic = true, $quote = false) {
     global $maxsubjectlength, $db;
-
+    
     MCached::connect();
     
     if ($newtopic) {
@@ -158,9 +156,7 @@ function insert_compose_frame($id, $newtopic = true, $quote = false) {
         
         while ($post = $postres->fetch_assoc()) {
             //-- Get poster details
-            
-            $userres = $db->query("SELECT * FROM users WHERE id = " . (int)$post["userid"] . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
-            
+            $userres = $db->query("SELECT avatar FROM users WHERE id = " . (int)$post["userid"] . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
             $user = $userres->fetch_assoc();
             
             $avatar = ($user["avatar"] && $user["avatar"] != "" ? security::html_safe($user["avatar"]) : "");
@@ -171,13 +167,12 @@ function insert_compose_frame($id, $newtopic = true, $quote = false) {
             
             end_table();
         }
-        
         end_frame();
     }
-
+    
     if (!isset($forumid))
         $forumid = 0;
-
+    
     insert_quick_jump_menu($forumid);
     block_end();
 }
@@ -185,7 +180,7 @@ function insert_compose_frame($id, $newtopic = true, $quote = false) {
 //-------- Global variables
 
 $maxsubjectlength = 40;
-$postsperpage = user::$current["postsperpage"];
+$postsperpage     = user::$current["postsperpage"];
 
 if (!$postsperpage)
     $postsperpage = 15;
@@ -213,8 +208,7 @@ if ($action == "post") {
         stderr(ERROR, ERR_FORUM_TOPIC);
     
     $newtopic = $forumid > 0;
-    
-    $subject = isset($_POST["subject"]) ? ($_POST["subject"]) : false;
+    $subject  = isset($_POST["subject"]) ? ($_POST["subject"]) : false;
     
     if ($newtopic) {
         $subject = trim($subject);
@@ -246,9 +240,10 @@ if ($action == "post") {
         $subject = sqlesc(security::html_safe($subject));
         
         $db->query("UPDATE forums SET topiccount = topiccount + 1 WHERE id = " . $forumid);
-        
         $db->query("INSERT INTO topics (userid, forumid, subject) VALUES(" . $userid . ", " . $forumid . ", " . $subject . ")") or sqlerr(__FILE__, __LINE__);
-
+        
+        MCached::del('get::topic::info::' . $topicid);
+        MCached::del('get::forum::info::' . $forumid);
         MCached::del('forum::id::' . $topicid);
         MCached::del('quick::jump::topics::' . $topicid);
         
@@ -256,7 +251,6 @@ if ($action == "post") {
     } else {
         //---- Make sure topic exists and is unlocked
         $res = $db->query("SELECT * FROM topics WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-        
         $arr = $res->fetch_assoc() or die(ERR_TOPIC_ID_NA);
         
         if ($arr["locked"] == 'yes' && user::$current["edit_forum"] != "yes")
@@ -268,10 +262,11 @@ if ($action == "post") {
     
     //------ Insert post
     $added = "UNIX_TIMESTAMP()";
-    $body = sqlesc($body);
+    $body  = sqlesc($body);
     
     $db->query("INSERT INTO posts (topicid, userid, added, body) " . "VALUES(" . $topicid . ", " . $userid . ", " . $added . ", " . $body . ")") or sqlerr(__FILE__, __LINE__);
     
+    Mcached::del('forum::user::posts::' . $userid);
     MCached::del('user::forum::posts::' . $userid);
     
     $postid = $db->insert_id; //or die(ERR_POST_ID_NA);
@@ -280,6 +275,7 @@ if ($action == "post") {
     update_topic_last_post($topicid);
     
     $db->query("UPDATE forums SET postcount = postcount + 1 WHERE id = " . $forumid);
+    MCached::del('get::forum::info::' . $forumid);
     
     //------ All done, redirect user to the post
     
@@ -287,10 +283,9 @@ if ($action == "post") {
     $postsperpage = user::$current["postsperpage"];
     
     $res = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row();
     
-    $posts = (int)$arr[0];
+    $posts  = (int)$arr[0];
     $tpages = floor($posts / $postsperpage);
     
     if ($tpages * $postsperpage != $posts)
@@ -298,12 +293,12 @@ if ($action == "post") {
     
     for ($i = 1; $i <= $tpages; ++$i)
         $headerstr = "forum.php?action=viewtopic&topicid=" . $topicid . "&page=" . $i;
-
+    
     if ($newtopic)
         redirect($headerstr);
     else
         redirect($headerstr . "#" . $postid);
-
+    
     die;
 }
 
@@ -325,22 +320,29 @@ if ($action == "viewtopic") {
     $userid = user::$current["uid"];
     
     //------ Get topic info
-    $res = $db->query("SELECT * FROM topics WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+    $arr = MCached::get('get::topic::info::' . $topicid);
+    if ($arr === MCached::NO_RESULT) {
+        $res = $db->query("SELECT * FROM topics WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+        $arr = $res->fetch_assoc() or stderr(ERROR, FORUM_ERROR . TOPIC_NOT_FOUND);
+        MCached::add('get::topic::info::' . $topicid, $arr, 25200);
+    }
     
-    $arr = $res->fetch_assoc() or stderr(ERROR, FORUM_ERROR . TOPIC_NOT_FOUND);
-    
-    $locked = ($arr["locked"] == 'yes');
+    $locked  = ($arr["locked"] == 'yes');
     $subject = security::html_safe(unesc($arr["subject"]));
-    $sticky = $arr["sticky"] == "yes";
+    $sticky  = $arr["sticky"] == "yes";
     $forumid = (int)$arr["forumid"];
     
     //------ Update hits column
     $db->query("UPDATE topics SET views = views + 1 WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
+    MCached::del('get::topic::info::' . $topicid);
     
     //------ Get forum
-    $res = $db->query("SELECT * FROM forums WHERE id = " . $forumid) or sqlerr(__FILE__, __LINE__);
-    
-    $arr = $res->fetch_assoc() or die("Forum = NULL");
+    $arr = MCached::get('get::forum::info::' . $forumid);
+    if ($arr === MCached::NO_RESULT) {
+        $res = $db->query("SELECT * FROM forums WHERE id = " . $forumid) or sqlerr(__FILE__, __LINE__);
+        $arr = $res->fetch_assoc() or die("Forum = NULL");
+        MCached::add('get::forum::info::' . $forumid, $arr, 25200);
+    }
     
     $forum = security::html_safe(unesc($arr["name"]));
     
@@ -351,10 +353,9 @@ if ($action == "viewtopic") {
         $usercan_write = false;
     else
         $usercan_write = true;
-
+    
     //------ Get post count
     $res = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row();
     
     $postcount = (int)$arr[0];
@@ -421,7 +422,7 @@ if ($action == "viewtopic") {
     print($pagemenu);
     
     print("<a name='top' />\n");
-
+    
     //------ Print table
     begin_frame();
     
@@ -430,7 +431,6 @@ if ($action == "viewtopic") {
     $pn = 0;
     
     $r = $db->query("SELECT lastpostread FROM readposts WHERE userid = " . user::$current["uid"] . " AND topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-    
     $a = $r->fetch_row();
     
     $lpr = (int)$a[0];
@@ -441,9 +441,9 @@ if ($action == "viewtopic") {
     while ($arr = $res->fetch_assoc()) {
         ++$pn;
         
-        $postid = (int)$arr["id"];
+        $postid   = (int)$arr["id"];
         $posterid = (int)$arr["userid"];
-        $added = get_date_time($arr["added"]) . "<br />(" . (get_elapsed_time(($arr["added"]))) . " ago)";
+        $added    = get_date_time($arr["added"]) . "<br />(" . (get_elapsed_time(($arr["added"]))) . " ago)";
         
         //---- Get poster details
         $arr2 = MCached::get('forum::poster::details::' . $posterid);
@@ -461,7 +461,7 @@ if ($action == "viewtopic") {
             $avatar = "";
         } else {
             $avatar = ($arr2["avatar"] && $arr2["avatar"] != "" ? security::html_safe($arr2["avatar"]) : "");
-            $title = security::html_safe($arr2["level"]);
+            $title  = security::html_safe($arr2["level"]);
             
             $flag = security::html_safe($arr2['name']);
             if (!$flag || $flag == "")
@@ -471,13 +471,17 @@ if ($action == "viewtopic") {
                 $flagpic = "unknown.gif";
             
             if (intval($arr2['downloaded']) > 0) {
-                $ratio = number_format((float)$arr2['uploaded'] / (float)$arr2['downloaded'], 2);
+                $ratio = number_format((float) $arr2['uploaded'] / (float) $arr2['downloaded'], 2);
             } else {
                 $ratio = '&infin;';
             }
             
-            $sql   = $db->query("SELECT * FROM posts INNER JOIN users ON posts.userid = users.id WHERE users.id = " . $posterid);
-            $posts = intval(0 + @$sql->num_rows);
+            $posts = MCached::get('forum::user::posts::' . $posterid);
+            if ($posts === MCached::NO_RESULT) {
+                $sql   = $db->query("SELECT * FROM posts INNER JOIN users ON posts.userid = users.id WHERE users.id = " . $posterid);
+                $posts = intval(0 + @$sql->num_rows);
+                MCached::add('forum::user::posts::' . $posterid, $posts, 14400);
+            }
             
             $by = "<a href='userdetails.php?id=" . $posterid . "'><b>" . $postername . "</b></a> (" . $title . ")";
         }
@@ -528,7 +532,7 @@ if ($action == "viewtopic") {
         attach_frame();
         
         $res = $db->query("SELECT id, name, minclasswrite FROM forums ORDER BY sort, name") or sqlerr(__FILE__, __LINE__);
-
+        
         print("<table class='lista' cellspacing='0' cellpadding='0'>\n");
         
         print("<form method='post' action='?action=setsticky'>\n");
@@ -667,6 +671,7 @@ if ($action == "movetopic") {
         @$db->query("UPDATE topics SET forumid = " . $forumid . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
         MCached::del('forum::id::' . $topicid);
         MCached::del('quick::jump::topics::' . $topicid);
+        MCached::del('get::topic::info::' . $topicid);
     }
     
     // modifying count topics & post
@@ -676,6 +681,8 @@ if ($action == "movetopic") {
     $numtopics = @$res->num_rows;
     $db->query("UPDATE forums SET topiccount = topiccount - " . $numtopics . ", postcount = postcount - " . $numposts . " WHERE id = " . $forumid);
     $db->query("UPDATE forums SET topiccount = topiccount + " . $numtopics . ", postcount = postcount + " . $numposts . " WHERE id = " . $forumid);
+    
+    MCached::del('get::forum::info::' . $forumid);
     
     // Redirect to forum page
     redirect("forum.php?action=viewforum&forumid=" . $forumid);
@@ -700,12 +707,16 @@ if ($action == "deletetopic") {
     $numtopic = $db->affected_rows;
     $db->query("DELETE FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
     $numposts = $db->affected_rows;
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     MCached::del('forum::id::' . $topicid);
     MCached::del('user::forum::posts::' . user::$current['uid']);
+    Mcached::del('forum::user::posts::' . user::$current['uid']);
     
     $db->query("UPDATE forums SET topiccount = topiccount - " . $numtopic . ", postcount = postcount - " . $numposts . " WHERE id = " . $forumid);
+    
+    MCached::del('get::forum::info::' . $forumid);
     
     redirect("forum.php?action=viewforum&forumid=" . $forumid);
     die;
@@ -778,7 +789,7 @@ if ($action == "editpost") {
 
 //-------- Action: Delete post
 if ($action == "deletepost") {
-    $postid = 0 + (int)$_GET["postid"];
+    $postid  = 0 + (int)$_GET["postid"];
     $forumid = 0 + (int)$_GET["forumid"];
     
     if (isset($_GET["sure"]) && $_GET["sure"])
@@ -791,14 +802,12 @@ if ($action == "deletepost") {
     
     //------- Get topic id
     $res = $db->query("SELECT topicid FROM posts WHERE id = " . $postid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row() or stderr(ERROR, ERR_POST_NOT_FOUND);
     
     $topicid = (int)$arr[0];
     
     //------- We can not delete the post if it is the only one of the topic
     $res = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row();
     
     if ($arr[0] < 2)
@@ -815,7 +824,6 @@ if ($action == "deletepost") {
         $perpage = user::$current["topicsperpage"];
         
         $res2 = $db->query("SELECT COUNT(*) FROM posts WHERE id <= " . (int)$arr[0] . " AND topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-        
         $arr2 = $res2->fetch_row();
         
         $posts = (int)$arr2[0];
@@ -837,8 +845,9 @@ if ($action == "deletepost") {
     //------- Delete post
     $db->query("DELETE FROM posts WHERE id = " . $postid) or sqlerr(__FILE__, __LINE__);
     $numposts = $db->affected_rows;
-
-    MCached::del('user::forum::posts::' . $postid);
+    
+    MCached::del('user::forum::posts::' . user::$current['uid']);
+    Mcached::del('forum::user::posts::' . user::$current['uid']);
     
     $db->query("UPDATE forums SET postcount = postcount - " . $numposts . " WHERE id = " . $forumid);
     
@@ -853,13 +862,14 @@ if ($action == "deletepost") {
 if ($action == "locktopic") {
     $forumid = 0 + (int)$_GET["forumid"];
     $topicid = 0 + (int)$_GET["topicid"];
-    $page = (isset($_GET["page"]) ? max(1, (int)$_GET["page"]) : "");
+    $page    = (isset($_GET["page"]) ? max(1, (int)$_GET["page"]) : "");
     
     if (!is_valid_id($topicid) || user::$current["edit_forum"] != "yes")
         die;
     
     $db->query("UPDATE topics SET locked = 'yes' WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     
     redirect("forum.php?action=viewforum&forumid=" . $forumid . "&page=" . $page);
@@ -870,13 +880,14 @@ if ($action == "locktopic") {
 if ($action == "unlocktopic") {
     $forumid = 0 + (int)$_GET["forumid"];
     $topicid = 0 + (int)$_GET["topicid"];
-    $page = (isset($_GET["page"]) ? max(1, (int)$_GET["page"]) : "");
+    $page    = (isset($_GET["page"]) ? max(1, (int)$_GET["page"]) : "");
     
     if (!is_valid_id($topicid) || user::$current["edit_forum"] != "yes")
         die;
     
     $db->query("UPDATE topics SET locked = 'no' WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     
     redirect("forum.php?action=viewforum&forumid=" . $forumid . "&page=" . $page);
@@ -892,7 +903,8 @@ if ($action == "setlocked") {
     
     $locked = sqlesc($_POST["locked"]);
     $db->query("UPDATE topics SET locked = " . $locked . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     
     redirect(addslashes($_POST['returnto']));
@@ -908,7 +920,8 @@ if ($action == "setsticky") {
     
     $sticky = sqlesc($_POST["sticky"]);
     $db->query("UPDATE topics SET sticky = " . $sticky . " WHERE id = " . $topicid) or sqlerr(__FILE__, __LINE__);
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     
     redirect(addslashes($_POST['returnto']));
@@ -933,7 +946,8 @@ if ($action == 'renametopic') {
     $subject = sqlesc($subject);
     
     $db->query("UPDATE topics SET subject = " . $subject . " WHERE id = " . $topicid) or sqlerr();
-
+    
+    MCached::del('get::topic::info::' . $topicid);
     MCached::del('quick::jump::topics::' . $topicid);
     
     $returnto = addslashes($_POST['returnto']);
@@ -959,7 +973,6 @@ if ($action == "viewforum") {
     
     //------ Get forum name
     $res = $db->query("SELECT name, minclassread FROM forums WHERE id = " . $forumid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_assoc() or die;
     
     $forumname = security::html_safe(unesc($arr["name"]));
@@ -975,7 +988,6 @@ if ($action == "viewforum") {
         $perpage = 20;
     
     $res = $db->query("SELECT COUNT(*) FROM topics WHERE forumid = " . $forumid) or sqlerr(__FILE__, __LINE__);
-    
     $arr = $res->fetch_row();
     
     $num = (int)$arr[0];
@@ -1045,7 +1057,6 @@ if ($action == "viewforum") {
     
     //------ Get topics data
     $topicsres = $db->query("SELECT * FROM topics WHERE forumid = " . $forumid . " ORDER BY sticky, lastpost DESC LIMIT " . $offset . ", " . $perpage);
-    
     $numtopics = $topicsres->num_rows;
     
     block_begin("<a href='forum.php'>" . FORUMS . "</a> &gt; " . $forumname . "\n");
@@ -1060,19 +1071,18 @@ if ($action == "viewforum") {
         print("</tr>\n");
         
         while ($topicarr = $topicsres->fetch_assoc()) {
-            $topicid = (int)$topicarr["id"];
+            $topicid      = (int)$topicarr["id"];
             $topic_userid = (int)$topicarr["userid"];
-            $topic_views = (int)$topicarr["views"];
-            $views = number_format($topic_views);
-            $locked = $topicarr["locked"] == "yes";
-            $sticky = $topicarr["sticky"] == "yes";
+            $topic_views  = (int)$topicarr["views"];
+            $views        = number_format($topic_views);
+            $locked       = $topicarr["locked"] == "yes";
+            $sticky       = $topicarr["sticky"] == "yes";
             
             //---- Get reply count
             $res = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-            
             $arr = $res->fetch_row();
             
-            $posts = (int)$arr[0];
+            $posts   = (int)$arr[0];
             $replies = intval($posts - 1);
             
             $tpages = floor($posts / $postsperpage);
@@ -1092,16 +1102,14 @@ if ($action == "viewforum") {
             
             //---- Get userID and date of last post
             $res = $db->query("SELECT * FROM posts WHERE topicid = " . $topicid . " ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-            
             $arr = $res->fetch_assoc();
             
             $lppostid = 0 + (int)$arr["id"];
             $lpuserid = 0 + (int)$arr["userid"];
-            $lpadded = "<nobr>" . get_date_time($arr["added"]) . "</nobr>";
+            $lpadded  = "<nobr>" . get_date_time($arr["added"]) . "</nobr>";
             
             //------ Get name of last poster
-            $res = $db->query("SELECT * FROM users WHERE id = " . $lpuserid) or sqlerr(__FILE__, __LINE__);
-            
+            $res = $db->query("SELECT username FROM users WHERE id = " . $lpuserid) or sqlerr(__FILE__, __LINE__);
             if ($res->num_rows == 1) {
                 $arr = $res->fetch_assoc();
                 
@@ -1111,7 +1119,6 @@ if ($action == "viewforum") {
             
             //------ Get author
             $res = $db->query("SELECT username FROM users WHERE id = " . $topic_userid) or sqlerr(__FILE__, __LINE__);
-            
             if ($res->num_rows == 1) {
                 $arr = $res->fetch_assoc();
                 
@@ -1121,10 +1128,9 @@ if ($action == "viewforum") {
             
             //---- Print row
             $r = $db->query("SELECT lastpostread FROM readposts WHERE userid = " . $userid . " AND topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-            
             $a = $r->fetch_row();
             
-            $new = !$a || $lppostid > (int)$a[0];
+            $new      = !$a || $lppostid > (int)$a[0];
             $topicpic = ($locked ? ($new ? "lockednew" : "locked") : ($new ? "unlockednew" : "unlocked"));
             
             $subject = ($sticky ? STICKY . ": " : "") . "<a href='?action=viewtopic&topicid=" . $topicid . "'><b>" . security::html_safe(unesc($topicarr["subject"])) . "</b></a>" . $topicpages;
@@ -1161,9 +1167,9 @@ if ($action == "viewforum") {
         print("<td class='embedded'><form method='get' action='?'><input type='hidden' " . "name='action' value='newtopic'><input type='hidden' name='forumid' " . "value='" . $forumid . "'><input type='submit' value='" . WORD_NEW . " " . TOPIC . "' class='btn' style='margin-left: 10px'></form></td>\n");
     
     print("</tr></table></p>\n");
-
+    
     insert_quick_jump_menu($forumid);
-
+    
     block_end();
     stdfoot();
     die;
@@ -1179,7 +1185,7 @@ if ($action == "viewunread") {
     
     block_begin(TOPIC_UNREAD_POSTS);
     
-    $n = 0;
+    $n  = 0;
     $uc = user::$current["id_level"];
     
     while ($arr = $res->fetch_assoc()) {
@@ -1188,7 +1194,6 @@ if ($action == "viewunread") {
         
         //---- Check if post is read
         $r = $db->query("SELECT lastpostread FROM readposts WHERE userid = " . $userid . " AND topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-        
         $a = $r->fetch_row();
         
         if ($a && $a[0] == $arr['lastpost'])
@@ -1196,7 +1201,6 @@ if ($action == "viewunread") {
         
         //---- Check access & get forum name
         $r = $db->query("SELECT name, minclassread FROM forums WHERE id = " . $forumid) or sqlerr(__FILE__, __LINE__);
-        
         $a = $r->fetch_assoc();
         
         if ($uc < $a['minclassread'])
@@ -1211,15 +1215,13 @@ if ($action == "viewunread") {
         
         if ($n == 1) {
             print("<table width='100%' class='lista' border='1' bordercolor='#FFFFFF' cellspacing='0' cellpadding='5'>\n");
-            
             print("<tr><td class='header' align='left'>Topic</td><td class='header' align='left'>" . MNU_FORUM . "</td></tr>\n");
         }
-
+        
         //---- Get reply count
         $postsperpage = user::$current["postsperpage"];
         
         $rescount = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $topicid) or sqlerr(__FILE__, __LINE__);
-        
         $arrcount = $rescount->fetch_row();
         
         $posts = (int)$arrcount[0];
@@ -1236,7 +1238,7 @@ if ($action == "viewunread") {
         
         print("<tr><td class='lista' align='left'><table border='0' cellspacing='0' cellpadding='0'><tr><td class='embedded'>" . image_or_link($STYLEPATH . "/unlockednew.png", "style='margin-right: 5px'", "unlockednew") . "</td><td class='embedded'>" . "<a href='?action=viewtopic&topicid=" . $topicid . "&page=" . $e . "#last'><b>" . security::html_safe(unesc($arr["subject"])) . "</b></a></td></tr></table></td><td class='lista' align='left'><a href='?action=viewforum&forumid=" . $forumid . "'><b>" . $forumname . "</b></a></td></tr>\n");
     }
-
+    
     if ($n > 0) {
         print("</table>\n");
         
@@ -1259,14 +1261,14 @@ if ($action == "search") {
     else
         $keywords = '';
     if ($keywords != "") {
-        $perpage = 50;
+        $perpage   = 50;
         $pagemenu1 = "";
-        $page = (isset($_GET["page"]) ? max(1, 0 + (int)$_GET["page"]) : 1);
+        $page      = (isset($_GET["page"]) ? max(1, 0 + (int)$_GET["page"]) : 1);
         $ekeywords = sqlesc($keywords);
         print("<p align='center'><b>" . SEARCHED_FOR . " \"" . security::html_safe($keywords) . "\"</b></p>\n");
-
+        
         $res = $db->query("SELECT COUNT(*) FROM posts WHERE MATCH (body) AGAINST (" . $ekeywords . ")") or sqlerr(__FILE__, __LINE__);
-        $arr = $res->fetch_row();
+        $arr  = $res->fetch_row();
         $hits = 0 + (int)$arr[0];
         if ($hits == 0)
             print("<p align='center'><b>" . SORRY . ", " . NO_TOPIC . "!</b></p>");
@@ -1283,37 +1285,37 @@ if ($action == "search") {
                 $pagemenu2 = "<font class='gray'><b>&lt;&lt; " . PREVIOUS . "</b></font>\n";
             else
                 $pagemenu2 = "<a href='forum.php?action=search&keywords=" . security::html_safe($keywords) . "&page=" . ($page - 1) . "'><b>&lt;&lt; " . PREVIOUS . "</b></a>\n";
-
-			$pagemenu2 .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n";
-
-			if ($page == $pages)
+            
+            $pagemenu2 .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n";
+            
+            if ($page == $pages)
                 $pagemenu2 .= "<font class='gray'><b>" . NEXT . " &gt;&gt;</b></font>\n";
             else
                 $pagemenu2 .= "<a href='forum.php?action=search&keywords=" . security::html_safe($keywords) . "&page=" . ($page + 1) . "'><b>" . NEXT . " &gt;&gt;</b></a>\n";
-
+            
             $offset = ($page * $perpage) - $perpage;
             $res = $db->query("SELECT id, topicid, userid, added FROM posts WHERE MATCH (body) AGAINST (" . $ekeywords . ") LIMIT " . $offset . ", " . $perpage) or sqlerr(__FILE__, __LINE__);
             $num = $res->num_rows;
-
-	    print("<p align='center'>" . $pagemenu1 . "<br />" . $pagemenu2 . "</p>");
+            
+            print("<p align='center'>" . $pagemenu1 . "<br />" . $pagemenu2 . "</p>");
             print("<table class='lista' width='100%' border='1' bordercolor='#FFFFFF' cellspacing='0' cellpadding='5'>\n");
             print("<tr><td class='header'>" . POST . "</td><td class='header' align='left'>" . TOPIC . "</td><td class='header' align='left'>" . FORUM . "</td><td class='header' align='left'>" . AUTHOR . "</td></tr>\n");
-
-	    for ($i = 0; $i < $num; ++$i) {
+            
+            for ($i = 0; $i < $num; ++$i) {
                 $post = $res->fetch_assoc();
                 $res2 = $db->query("SELECT forumid, subject FROM topics WHERE id = " . (int)$post['topicid']) or sqlerr(__FILE__, __LINE__);
                 $topic = $res2->fetch_assoc();
                 $res2 = $db->query("SELECT name, minclassread FROM forums WHERE id = " . (int)$topic['forumid']) or sqlerr(__FILE__, __LINE__);
                 $forum = $res2->fetch_assoc();
-
+                
                 if ($forum["name"] == "" || $forum["minclassread"] > user::$current["id_level"]) {
                     --$hits;
                     continue;
                 }
-
+                
                 $res2 = $db->query("SELECT username FROM users WHERE id = " . (int)$post['userid']) or sqlerr(__FILE__, __LINE__);
                 $user = $res2->fetch_assoc();
-
+                
                 if ($user["username"] == "")
                     $user["username"] = "Guest";
                 
@@ -1321,10 +1323,9 @@ if ($action == "search") {
                 $perpage = user::$current["topicsperpage"];
                 
                 $res3 = $db->query("SELECT COUNT(*) FROM posts WHERE id <= " . (int)$post['id'] . " AND topicid = " . (int)$post['topicid']) or sqlerr(__FILE__, __LINE__);
-                
                 $arr3 = $res3->fetch_row();
                 
-                $posts = (int)$arr3[0];
+                $posts  = (int)$arr3[0];
                 $tpages = floor($posts / $postsperpage);
                 
                 if ($tpages * $postsperpage != $posts)
@@ -1337,14 +1338,14 @@ if ($action == "search") {
                 
                 print("<tr><td class='lista'>" . (int)$post['id'] . "</td><td class='lista' align='left'><a href='?action=viewtopic&topicid=" . (int)$post['topicid'] . "&page=" . $e . "#" . (int)$post['id'] . "'><b>" . security::html_safe($topic["subject"]) . "</b></a></td><td align='left' class='lista'><a href='?action=viewforum&forumid=" . (int)$topic['forumid'] . "'><b>" . security::html_safe(unesc($forum["name"])) . "</b></a><td align='left' class='lista'><a href='userdetails.php?id=" . (int)$post['userid'] . "'><b>" . security::html_safe($user['username']) . "</b></a><br />" . AT . " " . get_date_time($post["added"]) . "</tr>\n");
             }
-
+            
             print("</table>\n");
             print("<p align='center'>" . $pagemenu2 . "<br />" . $pagemenu1 . "</p>");
             print("<p>&nbsp;&nbsp;" . FOUND . " " . $hits . " " . POST . ($hits != 1 ? "s" : "") . "</p>");
             print("<p align='center'><b>" . SEARCH_AGAIN . "</b></p>\n");
         }
     }
-
+    
     print("<center><form method='get' action='forum.php?'>\n");
     print("<input type='hidden' name='action' value='search'>\n");
     print("<table class='lista' border='1' bordercolor='#FFFFFF' cellspacing='0' cellpadding='5'>\n");
@@ -1380,33 +1381,30 @@ while ($forums_arr = $forums_res->fetch_assoc()) {
     if (user::$current["id_level"] < $forums_arr["minclassread"])
         continue;
     
-    $forumid = (int)$forums_arr["id"];
-    $forumname = security::html_safe(unesc($forums_arr["name"]));
+    $forumid          = (int)$forums_arr["id"];
+    $forumname        = security::html_safe(unesc($forums_arr["name"]));
     $forumdescription = security::html_safe(unesc($forums_arr["description"]));
-    $topiccount = number_format((int)$forums_arr["topiccount"]);
-    $postcount = number_format((int)$forums_arr["postcount"]);
+    $topiccount       = number_format((int)$forums_arr["topiccount"]);
+    $postcount        = number_format((int)$forums_arr["postcount"]);
     
     // Find last post ID
     $lastpostid = Cached::get_forum_last_post($forumid);
     
     // Get last post info
     $post_res = $db->query("SELECT added, topicid, userid FROM posts WHERE id = " . $lastpostid) or sqlerr(__FILE__, __LINE__);
-    
     if ($post_res->num_rows == 1) {
         $post_arr = $post_res->fetch_assoc() or die(ERR_BAD_LAST_POST);
         
         $lastposterid = (int)$post_arr["userid"];
         $lastpostdate = get_date_time($post_arr["added"]);
-        $lasttopicid = (int)$post_arr["topicid"];
+        $lasttopicid  = (int)$post_arr["topicid"];
         
         $user_res = $db->query("SELECT username FROM users WHERE id = " . $lastposterid) or sqlerr(__FILE__, __LINE__);
-        
         $user_arr = $user_res->fetch_assoc();
         
         $lastposter = security::html_safe($user_arr['username']);
         
         $topic_res = $db->query("SELECT subject FROM topics WHERE id = " . $lasttopicid) or sqlerr(__FILE__, __LINE__);
-        
         $topic_arr = $topic_res->fetch_assoc();
         
         $lasttopic = security::html_safe(unesc($topic_arr['subject']));
@@ -1415,10 +1413,9 @@ while ($forums_arr = $forums_res->fetch_assoc()) {
         $postsperpage = (user::$current["postsperpage"] > 0 ? user::$current["postsperpage"] : 15);
         
         $res = $db->query("SELECT COUNT(*) FROM posts WHERE topicid = " . $lasttopicid) or sqlerr(__FILE__, __LINE__);
-        
         $arr = $res->fetch_row();
         
-        $posts = (int)$arr[0];
+        $posts  = (int)$arr[0];
         $tpages = floor($posts / $postsperpage);
         
         if ($tpages * $postsperpage != $posts)
@@ -1439,7 +1436,7 @@ while ($forums_arr = $forums_res->fetch_assoc()) {
             $img = "unlockednew";
     } else {
         $lastpost = "N/A";
-        $img = "unlocked";
+        $img      = "unlocked";
     }
     print("<tr><td class='lista' align='left'><table border='0' cellspacing='0' cellpadding='0'><tr><td class='embedded' style='padding-right: 5px'>" . image_or_link($STYLEPATH . "/" . $img . ".png", "", $img) . "</td><td class='embedded'><a href='?action=viewforum&forumid=" . $forumid . "'><b>" . $forumname . "</b></a><br />\n" . "" . $forumdescription . "</td></tr></table></td><td class='lista' align='center'>" . $topiccount . "</td><td class='lista' align='center'>" . $postcount . "</td>" . "<td class='lista' align='center'>" . $lastpost . "</td></tr>\n");
 }
