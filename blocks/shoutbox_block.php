@@ -180,7 +180,7 @@ if (user::$current["uid"] > 1) {
         if (user::$current["edit_torrents"] == "yes") {
 ?>
 <form action="<?php
-            echo $_SERVER['PHP_SELF'];
+            echo security::esc_url($_SERVER['PHP_SELF']);
 ?>" method="post">
    <input type="submit" name="action" value="Clean" /> &nbsp; &nbsp; &nbsp;<a href="javascript: Pophistory()"><?php
             echo HISTORY;
