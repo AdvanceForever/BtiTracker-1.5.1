@@ -6,7 +6,7 @@ if (!defined('IN_INSTALL')) die('Hacking attempt!');
 require_once ('../include/config.php');
 
 /*/ BigDump ver. 0.24b from 2006-06-25/*/
-$filename = '../sql/btit.sql'; // Specify the dump filename to suppress the file selection dialog
+$filename = '../install/sql/btit.sql'; // Specify the dump filename to suppress the file selection dialog
 $linespersession = 3000; // Lines to be executed per one import session
 $delaypersession = 0; // You can specify a sleep time in milliseconds after each session
 

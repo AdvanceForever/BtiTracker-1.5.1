@@ -44,10 +44,14 @@ print("<td align='center' class='header'>" . PEER_CLIENT . "</td>\n");
 print("<td align='center' class='header'>" . DOWNLOADED . "</td>\n");
 print("<td align='center' class='header'>" . UPLOADED . "</td>\n");
 print("<td align='center' class='header'>" . RATIO . "</td>\n");
+
+if ($GLOBALS['seed_time'] == 'yes') {
+    print("<td align='center' class='header'>" . SEED_TIME . "</td>\n");
+}
+
 print("<td align='center' class='header'>" . FINISHED . "</td></tr>\n");
 
-while ($row = $res->fetch_array(MYSQLI_BOTH))
-{
+while ($row = $res->fetch_array(MYSQLI_BOTH)) {
     print("<tr><td align='center' class='lista'>".
        "<a href='userdetails.php?id=" . (int)$row["uid"] . "'>" . security::html_safe(unesc($row["username"])) . "</a></td>".
        "<td align='center' class='lista'><a href='usercp.php?do=pm&action=edit&uid=" . user::$current['uid'] . "&what=new&to=" . urlencode(unesc($row["username"])) . "'>" . image_or_link($STYLEPATH . "/pm.png", "", "PM") . "</a></td>");
@@ -71,11 +75,42 @@ while ($row = $res->fetch_array(MYSQLI_BOTH))
 	    $ratio = "&infin;";
     }
     print("<td align='center' class='lista'>" . $ratio . "</td>");
+
+    #Seeding Time by Yupy...
+    if ($GLOBALS['seed_time'] == 'yes') {
+        if ($row['seedtime'] >= 36000) $seedtime = "<font color='lime'>";
+        else if ($row['seedtime'] >= 25200) $seedtime = "<font color='yellow'>";
+        else if ($row['seedtime'] >= 14400) $seedtime = "<font color='orange'>";
+        else if ($row['seedtime'] >= 3600) $seedtime = "<font color='red'>";
+        else if ($row['seedtime'] > 0) $seedtime = "<font color='limegreen'>";
+        else if ($row['seedtime'] == 0) $seedtime = "<font color='black'>0";
+        else $seedtime ="<font color='black'>";
+
+        $mins = floor($row['seedtime'] / 60);
+        $hours = floor($mins / 60);
+        $mins -= $hours * 60;
+        $days = floor($hours / 24);
+        $hours -= $days * 24;
+        $weeks = floor($days / 7);
+        $days -= $weeks * 7;
+        $secs = number_format(((($row['seedtime'] / 60) - $mins) * 60 - $hours * 60 * 60 - $days * 24 * 60 * 60 - $weeks * 7 * 24 * 60 * 60), 0);
+
+        if ($weeks > 0) $seedtime .= " $weeks"."W ";
+        if ($days > 0) $seedtime .= " $days"."D ";
+        if ($hours > 0) $seedtime .= " $hours"."h";
+        if ($mins > 0) $seedtime .= " $mins"."m";
+        if ($secs > 0) $seedtime .= " $secs"."s";
+
+        $seedtime .= "</font>";
+        print("\n<td align='center' class='lista'>" . $seedtime . "</td>");
+    }
+    #Seeding Time by Yupy End...
+
     print("<td align='center' class='lista'>" . get_elapsed_time($row["date"]) . " ago</td></tr>");
 }
 
 if ($res->num_rows == 0)
-    print("<tr><td align='center' colspan='9' class='lista'>No history to display</td></tr>");
+    print("<tr><td align='center' colspan='10' class='lista'>No history to display</td></tr>");
 
 print("</table>");
 

@@ -24,7 +24,7 @@ if (!user::$current || user::$current["view_users"] == "no") {
 	
     if ($a) {
         if (user::$current["view_users"] == "yes")
-            $latestuser = "<a href='userdetails.php?id=" . (int)$a["id"] . "'>" . security::html_safe($a["username"]) . "</a>";
+            $latestuser = "<a href='userdetails.php?id=" . (int)$a["id"] . "'>" . security::html_safe($a["username"]) . "</a>" . Warn_disabled($a['id']);
         else
             $latestuser = security::html_safe($a['username']);
 

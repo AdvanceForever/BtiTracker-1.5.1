@@ -64,9 +64,11 @@ if (!user::$current || user::$current["view_forum"] == "no") {
             }
             
             if ($trow['lastpost'])
-                print("<tr><td class='lista'><b><a href='forum.php?action=viewtopic&amp;topicid=" . (int)$trow['id'] . "&amp;page=last#" . (int)$trow['lastpost'] . "'>" . security::html_safe(unesc($trow['subject'])) . "</a></b><br />" . LAST_POST_BY . " <a href='userdetails.php?id=" . $last_post_userid . "'>" . $pcolor . $last_poster . $scolor . "</a><br />On " . $last_post_time . "</td></tr>\n");
+                print("<tr><td class='lista'><b><a href='forum.php?action=viewtopic&amp;topicid=" . (int)$trow['id'] . "&amp;page=last#" . (int)$trow['lastpost'] . "'>" . security::html_safe(unesc($trow['subject'])) . "</a></b><br />" . LAST_POST_BY . " <a href='userdetails.php?id=" . $last_post_userid . "'>" . $pcolor . $last_poster . $scolor . "</a>" . Warn_disabled($last_post_userid) . "
+<br />On " . $last_post_time . "</td></tr>\n");
             else
-                print("<tr><td class='lista'><b><a href='forum.php?action=viewtopic&amp;topicid=" . (int)$trow['id'] . "&amp;page=last'>" . security::html_safe(unesc($trow['subject'])) . "</a></b><br />" . LAST_POST_BY . " <a href='userdetails.php?id=" . $last_post_userid . "'>" . $pcolor . $last_poster . $scolor . "</a><br />On " . $last_post_time . "</td></tr>\n");
+                print("<tr><td class='lista'><b><a href='forum.php?action=viewtopic&amp;topicid=" . (int)$trow['id'] . "&amp;page=last'>" . security::html_safe(unesc($trow['subject'])) . "</a></b><br />" . LAST_POST_BY . " <a href='userdetails.php?id=" . $last_post_userid . "'>" . $pcolor . $last_poster . $scolor . "</a>" . Warn_disabled($last_post_userid) . "
+<br />On " . $last_post_time . "</td></tr>\n");
         }
     } else {
         print("<tr><td class='lista'>" . NO_TOPIC . "</td></tr>\n");

@@ -17,18 +17,20 @@ dbconn();
 
 function standardheader($title, $normalpage = true, $idlang = 0) {
     global $SITENAME, $STYLEPATH, $USERLANG, $time_start, $gzip, $GZIP_ENABLED, $err_msg_install, $db;
-    
+
+    MCached::connect();
+
     $time_start = get_microtime();
     
-    // default settings for blocks/menu
-    if (!isset($GLOBALS["charset"]))
-        $GLOBALS["charset"] = "iso-8859-1";
+    #default settings for blocks/menu
+    if (!isset($GLOBALS['charset']))
+        $GLOBALS['charset'] = 'iso-8859-1';
     
-    // controll if client can handle gzip
+    #controll if client can handle gzip
     if ($GZIP_ENABLED && user::$current['uid'] > 1) {
-        if (stristr($_SERVER["HTTP_ACCEPT_ENCODING"], "gzip") && extension_loaded('zlib') && ini_get("zlib.output_compression") == 0) {
+        if (stristr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') && extension_loaded('zlib') && ini_get('zlib.output_compression') == 0) {
             if (ini_get('output_handler') != 'ob_gzhandler') {
-                ob_start("ob_gzhandler");
+                ob_start('ob_gzhandler');
                 $gzip = 'enabled';
             } else {
                 ob_start();
@@ -41,34 +43,41 @@ function standardheader($title, $normalpage = true, $idlang = 0) {
     } else
         $gzip = 'disabled';
     
-    header("Content-Type: text/html; charset=" . $GLOBALS["charset"]);
+    header('Content-Type: text/html; charset=' . $GLOBALS['charset']);
     
-    if ($title == "")
+    if ($title == '')
         $title = unesc($SITENAME);
     else
-        $title = unesc($SITENAME) . " - " . security::html_safe($title);
+        $title = security::html_safe($title) . ' :: ' . unesc($SITENAME);
     
-   ?>
-   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-   <html><head>
+    ?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html><head>
     <title>
-	<?php
+    <?php
     echo $title;
     ?>
-	</title>
+    </title>
     <?php
     // get user's style
-    $resheet = $db->query("SELECT * FROM style WHERE id = " . user::$current["style"]);
+    $key = 'user::style::' . user::$current['style'];
+    $resstyle = MCached::get($key);
+    if ($resstyle === MCached::NO_RESULT) 
+    $resheet = $db->query("SELECT * FROM style WHERE id = " . user::$current['style']);
     if (!$resheet) {
-        $STYLEPATH = "./style/base";
-        $style     = "./style/base/torrent.css";
+        $STYLEPATH = './style/base';
+        $style     = './style/base/torrent.css';
     } else {
         $resstyle  = $resheet->fetch_array(MYSQLI_BOTH);
-        $STYLEPATH = $resstyle["style_url"];
-        $style     = $resstyle["style_url"] . "/torrent.css";
+        MCached::add($key, $resstyle, 3600);
+
+        $STYLEPATH = $resstyle['style_url'];
+        $style     = $resstyle['style_url'] . '/torrent.css';
     }
+
+
     print("<link rel='stylesheet' href='" . $style . "' type='text/css' />");
-	print("<link rel='stylesheet' href='style/base/ui.css' type='text/css' />");
+    print("<link rel='stylesheet' href='style/base/ui.css' type='text/css' />");
     ?>
     </head>
     <body>
@@ -78,13 +87,13 @@ function standardheader($title, $normalpage = true, $idlang = 0) {
     if ($idlang == 0)
         $reslang = $db->query("SELECT * FROM language WHERE id = " . user::$current["language"]);
     else
-        $reslang = $db->query("SELECT * FROM language WHERE id=$idlang");
+        $reslang = $db->query("SELECT * FROM language WHERE id = " . $idlang);
     
     if (!$reslang) {
         $USERLANG = "language/english.php";
     } else {
         $rlang    = $reslang->fetch_array(MYSQLI_BOTH);
-        $USERLANG = "" . $rlang["language_url"];
+        $USERLANG = unesc($rlang['language_url']);
     }
     
     clearstatcache();
@@ -198,37 +207,38 @@ function redirect($redirecturl) {
 }
 
 $smilies = array(
-	':angry:'       => 'angry.gif',
-	':D'	        => 'biggrin.gif',
-	':|'		=> 'blank.gif',
-	':blush:'	=> 'blush.gif',
-	':cool:'	=> 'cool.gif',
-	':(('		=> 'crying.gif',
-	':<<:'		=> 'eyesright.gif',
-	':frown:'	=> 'frown.gif',
-	':heart:'	=> 'heart.gif',
-	':unsure:'	=> 'hmm.gif',
-	':lol:'		=> 'laughing.gif',
-	':ninja:'	=> 'ninja.gif',
-	':no:'		=> 'no.gif',
-	':nod:'		=> 'nod.gif',
-	':ohno:'	=> 'ohnoes.gif',
-	':omg:'		=> 'omg.gif',
-	':O'		=> 'ohshit.gif',
-	':paddle:'	=> 'paddle.gif',
-	':('		=> 'sad.gif',
-	':shifty:'	=> 'shifty.gif',
-	':sick:'	=> 'sick.gif',
-	':)'		=> 'smile.gif',
-	':sorry:'	=> 'sorry.gif',
-	':thanks:'	=> 'thanks.gif',
-	':P'		=> 'tongue.gif',
-	':wave:'	=> 'wave.gif',
-	';)'		=> 'wink.gif',
-	':creepy:'	=> 'creepy.gif',
-	':worried:'	=> 'worried.gif',
-	':wtf:'		=> 'wtf.gif',
-	':wub:'		=> 'wub.gif',
+	':)'            => 'smile.svg',
+	':D'	        => 'smilegrin.svg',
+	':angel:'	=> 'angel.svg',
+	':angry:'	=> 'angry.svg',
+	':confused:'	=> 'confused.svg',
+	':crying:'      => 'crying.svg',
+	':hugleft:'	=> 'hugleft.svg',
+	':clown:'	=> 'clown.svg',
+	':cool:'	=> 'cool.svg',
+	':devilish:'	=> 'devilish.svg',
+	':embarrassed:'	=> 'embarrassed.svg',
+	':glasses:'	=> 'glasses.svg',
+	':hugright:'	=> 'hugright.svg',
+	':kiss:'	=> 'kiss.svg',
+	':lol:'	        => 'laughing.svg',
+	':love:'	=> 'love.svg',
+	':martini:'	=> 'martini.svg',
+	':ninja:'	=> 'ninja.svg',
+	':pirate:'	=> 'pirate.svg',
+	':plain:'	=> 'plain.svg',
+	':quiet:'	=> 'quiet.svg',
+	':raspberry:'	=> 'raspberry.svg',
+	':sad:'	        => 'sad.svg',
+	':sick:'	=> 'sick.svg',
+	':sleeping:'	=> 'sleeping.svg',
+	':smilebig:'	=> 'smilebig.svg',
+	':smirk:'	=> 'smirk.svg',
+	':surprise:'	=> 'surprise.svg',
+	':uncertain:'	=> 'uncertain.svg',
+	':wink:'	=> 'wink.svg',
+	':worried:'	=> 'worried.svg',
+	':yawn:'	=> 'yawn.svg',
 );
 
 function format_urls($s) {
@@ -477,6 +487,19 @@ function textbbcode($form, $text, $content = "") {
 	
 	$text_bbcode = $tpl->draw( $STYLEPATH . '/tpl/text_bbcode', $return_string = true );
     echo $text_bbcode;
+}
+
+function textbbcode2($form, $text, $content = "") {
+    global $tpl, $STYLEPATH;
+	
+	$var_text = $text;
+	$tpl->assign( "text", $var_text );
+	
+	$var_content = security::html_safe($content);
+	$tpl->assign( "content", $var_content );
+	
+	$text_bbcode = $tpl->draw( $STYLEPATH . '/tpl/text_bbcode', $return_string = true );
+    return $text_bbcode;
 }
 
 function begin_table($fullwidth = false, $padding = 5) {

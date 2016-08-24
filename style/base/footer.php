@@ -1,7 +1,4 @@
-    </td>
-    <?php //right_menu(); ?>
+</td>
 </tr>
 </table>
-
-
-</table>
+<div id="bottom-bg">

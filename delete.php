@@ -54,6 +54,7 @@ if (isset($_POST["action"])) {
         @$db->query("DELETE FROM history WHERE infohash = '" . $hash . "'");
         
         MCached::del('torrent::details::' . $hash);
+        MCached::del('torrent::details::image::' . $hash);
         
         unlink($TORRENTSDIR . "/" . $hash . ".btf");
         

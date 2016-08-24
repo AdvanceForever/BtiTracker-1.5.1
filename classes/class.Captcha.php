@@ -3,11 +3,10 @@
 * BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
 * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
 * Updated and Maintained by Yupy.
-* Copyright (C) 2004-2015 Btiteam.org
+* Copyright (C) 2004-2016 Btiteam.org
 */
 
-class ocr_captch
-{
+class ocr_captch {
     var $key; // ultra private static text
     var $long = 6; // size of text
     var $lx = 120; // width of picture
@@ -17,8 +16,8 @@ class ocr_captch
     var $imagetype = "png"; // can also be "png";
     var $public_key; // public key
     var $font_file = "./include/adlibn.ttf";
-    function ocr_captcha($long = 6, $lx = 120, $ly = 30, $nb_noise = 25)
-    {
+
+    function ocr_captcha($long = 6, $lx = 120, $ly = 30, $nb_noise = 25) {
         $this->key        = md5("A nicely little text to stay private and use for generate private key");
         $this->long       = $long;
         $this->lx         = $lx;
@@ -27,8 +26,7 @@ class ocr_captch
         $this->public_key = substr(md5(uniqid(mt_rand(), true)), 0, $this->long); // generate public key with entropy
     }
     
-    function get_filename($public = "")
-    {
+    function get_filename($public = "") {
         global $TORRENTSDIR;
         if ($public == "")
             $public = $this->public_key;
@@ -36,16 +34,14 @@ class ocr_captch
     }
     
     // generate the private text coming from the public text, using $this->key (not to be public!!), all you have to do is here to change the algorithm
-    function generate_private($public = "")
-    {
+    function generate_private($public = "") {
         if ($public == "")
             $public = $this->public_key;
         return substr(md5($this->key . $public), 16 - $this->long / 2, $this->long);
     }
     
     // check if the public text is link to the private text
-    function check_captcha($public, $private)
-    {
+    function check_captcha($public, $private) {
         // when check, destroy picture on disk
         if (file_exists($this->get_filename($public)))
             unlink($this->get_filename($public));
@@ -53,8 +49,7 @@ class ocr_captch
     }
     
     // display a captcha picture with private text and return the public text
-    function make_captcha($noise = true)
-    {
+    function make_captcha($noise = true) {
         $private_key = $this->generate_private();
         $image       = imagecreatetruecolor($this->lx, $this->ly);
         $back        = ImageColorAllocate($image, intval(mt_rand(224, 255)), intval(mt_rand(224, 255)), intval(mt_rand(224, 255)));
@@ -100,8 +95,7 @@ class ocr_captch
         ImageDestroy($image);
     }
     
-    function display_captcha($noise = true)
-    {
+    function display_captcha($noise = true) {
         $this->make_captcha($noise);
         $res = "<input type='hidden' name='public_key' value='" . $this->public_key . "'>\n";
         $res .= "<img align='middle' src='" . $this->get_filename() . "' border='0'>\n";

@@ -157,7 +157,12 @@ if (user::$current["edit_users"] == "yes") {
             exit();
         }
 
-        @$db->query("DELETE FROM users WHERE username = '" . $db->real_escape_string($_POST["user"]) . "'");
+        @$db->query("DELETE FROM users WHERE username = '" . $db->real_escape_string($_POST['user']) . "'");
+
+        if ($GLOBALS['warn_system'] == 'yes') {
+            @$db->query("DELETE FROM warnings WHERE userid = '" . $db->real_escape_string($_POST['uid']) . "'");
+        }
+
         write_log("Deleted user " . $db->real_escape_string($_POST["user"]), "delete");
         print("<script language='javascript'>window.location.href='" . $link . "'</script>");
         block_end();
@@ -504,7 +509,7 @@ function aggiungiutente() {
     $idflag   = intval($_POST["flag"]);
     $timezone = intval($_POST["timezone"]);
     
-    if (utf8::strtoupper($utente) == utf8::strtoupper("Guest")) {
+    if (strtoupper($utente) == strtoupper("Guest")) {
         print(ERROR . " " . ERR_GUEST_EXISTS . "<br />\n");
         print("<a href='account.php'>" . BACK . "</a>");
         block_end();
@@ -535,7 +540,7 @@ function aggiungiutente() {
         exit;
     }
     
-    $res = $db->query("SELECT email FROM users WHERE email = '" . $email . "'");
+    $res = $db->query("SELECT email FROM users WHERE email = '" . $email . "'") or sqlerr(__FILE__, __LINE__);
     if ($res->num_rows > 0) {
         return -2;
         exit;
@@ -546,15 +551,15 @@ function aggiungiutente() {
         exit;
     }
     
-    // duplicate username
-    $res = $db->query("SELECT username FROM users WHERE username = '" . $utente . "'");
+    //// duplicate username
+    $res = $db->query("SELECT username FROM users WHERE username = '" . $utente . "'") or sqlerr(__FILE__, __LINE__);
     if ($res->num_rows > 0) {
         return -4;
         exit;
     }
     // duplicate username
     
-    if (strpos($db->real_escape_string($utente), " ") == true) {
+    if (strpos($utente, " ") == true) {
         return -7;
         exit;
     }
@@ -589,7 +594,7 @@ function aggiungiutente() {
         exit;
     }
     
-    @$db->query("INSERT INTO users (username, password, random, id_level, email, style, language, flag, joined, lastconnect, pid, time_offset) VALUES ('" . $utente . "', '" . md5($pwd) . "', " . $random . ", " . $idlevel . ", '" . $email . "', " . $idstyle . ", " . $idlangue . ", " . $idflag . ", NOW(), NOW(), '" . md5(uniqid(mt_rand(), true)) . "', '" . $timezone . "')");
+    @$db->query("INSERT INTO users (username, password, random, id_level, email, style, language, flag, joined, lastconnect, pid, time_offset) VALUES ('" . $utente . "', '" . md5($pwd) . "', " . $random . ", " . $idlevel . ", '" . $email . "', " . $idstyle . ", " . $idlangue . ", " . $idflag . ", NOW(), NOW(), '" . md5(uniqid(mt_rand(), true)) . "', '" . $timezone . "')") or sqlerr(__FILE__, __LINE__);
     
     MCached::del('latest::member');
 

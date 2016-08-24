@@ -11,7 +11,7 @@ dbconn(true);
 
 standardheader('User Control Panel');
 
-$uid = (isset($_GET["uid"]) ? intval($_GET["uid"]) : 1);
+$uid = (isset($_GET['uid']) ? intval($_GET['uid']) : 1);
 
 ?>
 <script type="text/javascript">
@@ -26,30 +26,38 @@ if (window.focus) {newwindow.focus()}
 </script>
 <?php
 
-if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
+if (user::$current['uid'] != $uid || user::$current['uid'] == 1) {
     err_msg(ERROR, ERR_USER_NOT_USER);
     stdfoot();
     exit;
 } else {
-    $utorrents = user::$current["torrentsperpage"];
-    if (isset($_GET["do"]))
-        $do = security::html_safe($_GET["do"]);
+    $utorrents = user::$current['torrentsperpage'];
+
+    if (isset($_GET['do']))
+        $do = security::html_safe($_GET['do']);
     else
         $do = '';
-    if (isset($_GET["action"]))
-        $action = security::html_safe($_GET["action"]);
+
+    if (isset($_GET['action']))
+        $action = security::html_safe($_GET['action']);
     
-    // begin the real admin page
-    block_begin(user::$current["username"] . "'s Control Panel");
-    print("\n<table class='lista' width='100%' align='center'><tr>");
-    print("\n<td class='header' align='center'><a href='usercp.php?uid=".$uid."'>" . MNU_UCP_HOME . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?uid=".$uid."&do=pm&action=list&what=inbox'>" . MNU_UCP_PM . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?uid=".$uid."&do=pm&action=list&what=outbox'>" . MNU_UCP_OUT . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?do=pm&action=edit&uid=".$uid."&what=new'>" . MNU_UCP_NEWPM . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?do=user&action=change&uid=".$uid."'>" . MNU_UCP_INFO . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?do=pwd&action=change&uid=".$uid."'>" . MNU_UCP_CHANGEPWD . "</a></td>");
-    print("\n<td class='header' align='center'><a href='usercp.php?do=pid_c&action=change&uid=".$uid."'>" . CHANGE_PID . "</a></td>");
-    print("\n</tr></table>\n");
+    // begin the real usercp page
+    block_begin(user::$current['username'] . "'s Control Panel");
+
+    $smarty->assign('usercpmenu_uid', $uid);
+
+    $smarty->assign('lang_usercpmenu',
+              array('home' => MNU_UCP_HOME,
+                    'inbox' => MNU_UCP_PM,
+                    'outbox' => MNU_UCP_OUT,
+                    'new_pm' => MNU_UCP_NEWPM,
+                    'change_profile' => MNU_UCP_INFO,
+                    'change_password' => MNU_UCP_CHANGEPWD,
+                    'change_pid' => CHANGE_PID
+                   )
+              );
+
+    $smarty->display($STYLEPATH . '/tpl/user/usercp_menu.tpl');
     
     if ($do == "pm" && $action == "list") {
         // MODIFIED select for deletion by gAnDo
@@ -255,73 +263,80 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
                 }
             }
         }
-	elseif ($_POST["confirm"] == FRM_PREVIEW) {
+	elseif ($_POST['confirm'] == FRM_PREVIEW) {
             block_begin(PRIVATE_MSG);
 
             block_begin(FRM_PREVIEW);
 
-            print("<table width='100%' align='center' class='lista'><tr><td class='lista' align='center'>" . format_comment(unesc($_POST["msg"])) . "</td></tr>\n");
-            print("</table>");
-            block_end();
-            print("<br />");
+            $smarty->assign('pmpreview_message', format_comment(unesc($_POST['msg'])));
 
-            print("\n<form method='post' name='edit' action='usercp.php?do=" . $do . "&action=post&uid=" . $uid . "&what=" . security::html_safe($_GET["what"]) . "'><table class='lista' align='center' cellpadding='2'>");
-            print("\n<tr><td class='header'>" . RECEIVER . ":</td><td class='header'><input type='text' name='receiver' value='" . security::html_safe(unesc($_POST["receiver"])) . "' size='40' maxlength='40' />&nbsp;&nbsp;" . ($_GET["what"] == "new" ? "<a href='javascript:popusers('searchusers.php');'>" . FIND_USER . "</a>" : "") . "</td></tr>");
-            print("\n<tr><td class='header'>" . SUBJECT . ":</td><td class='header'><input type='text' name='subject' value='" . security::html_safe(unesc($_POST["subject"])) . "' size='40' maxlength='40' /></td></tr>");
-            print("\n<tr><td colspan='2'>");
-            print(textbbcode("edit", "msg", security::html_safe(unesc($_POST["msg"]))));
-            print("\n</td></tr>");
-            print("\n</table>");
-            print("<br />");
-            print("\n<table class='lista' width='100%' align='center'>");
-            print("\n<tr><td class='lista' align='center'><input type='submit' name='confirm' value='" . FRM_CONFIRM . "' /></td>");
-            print("<td class='lista' align='center'><input type='submit' name='confirm' value='" . FRM_PREVIEW . "' /></td>");
-            print("<td class='lista' align='center'><input type='submit' name='confirm' value='" . FRM_CANCEL . "' /></td></tr>");
-            print("\n</table></form>");
+            block_end();
+
+            $smarty->assign('pmpreview_do', $do);
+            $smarty->assign('pmpreview_uid', $uid);
+            $smarty->assign('pmpreview_what', security::html_safe($_GET['what']));
+            $smarty->assign('pmpreview_receiver', security::html_safe(unesc($_POST['receiver'])));
+            $smarty->assign('pmpreview_find_user', ($_GET['what'] == 'new' ? "<a href='javascript:popusers('searchusers.php');'>" . FIND_USER . "</a>" : ''));
+            $smarty->assign('pmpreview_subject', security::html_safe(unesc($_POST['subject'])));
+            $smarty->assign('pmpreview_compose', textbbcode2('edit', 'msg', security::html_safe(unesc($_POST['msg']))));
+
+            $smarty->assign('lang_pmpreview',
+                      array('receiver' => RECEIVER,
+                            'subject' => SUBJECT,
+                            'confirm' => FRM_CONFIRM,
+                            'preview' => FRM_PREVIEW,
+                            'cancel' => FRM_CANCEL
+                            )
+                      );
+
+            $smarty->display($STYLEPATH . '/tpl/user/pm_preview.tpl');
+
             block_end();
         }
 		else
-            redirect("usercp.php?uid=" . $uid . "&do=pm&action=list");
+            redirect('usercp.php?uid=' . $uid . '&do=pm&action=list');
     }
-	elseif ($do == "pwd" && $action == "change") {
+	elseif ($do == 'pwd' && $action == 'change') {
         block_begin(MNU_UCP_CHANGEPWD);
 
-        print("\n<form method='post' name='password' action='usercp.php?do=pwd&action=post&uid=" . $uid . "'><table class='lista' width='100%' align='center'>");
-        print("\n<tr><td class='header'>" . OLD_PWD . "</td><td class='lista'><input type='password' name='old_pwd' size='40' maxlength='40' /></td></tr>");
-        print("\n<tr><td class='header'>" . USER_PWD . "</td><td class='lista'><input type='password' name='new_pwd' size='40' maxlength='40' /></td></tr>");
-        print("\n<tr><td class='header'>" . USER_PWD_AGAIN . "</td><td class='lista'><input type='password' name='new_pwd1' size='40' maxlength='40' /></td></tr>");
-        print("\n</table>");
-        print("<br />");
-        print("\n<table class='lista' width='100%' align='center'>");
-        print("\n<tr><td class='lista' align='center'><input type='submit' name='confirm' value='" . FRM_CONFIRM . "'/></td><td class='lista' align='center'><input type='submit' name='confirm' value='" . FRM_CANCEL . "'/></td></tr>");
-        print("\n</table></form>");
-        print("<br />");
+        $smarty->assign('changepassword_uid', $uid);
+
+        $smarty->assign('lang_changepassword',
+                  array('old_password' => OLD_PWD,
+                        'new_password' => USER_PWD,
+                        'password_again' => USER_PWD_AGAIN,
+                        'confirm' => FRM_CONFIRM,
+                        'cancel' => FRM_CANCEL
+                        )
+                  );
+
+        $smarty->display($STYLEPATH . '/tpl/user/usercp_change_password.tpl');
+
         block_end();
-        print("<br />");
     }
-	elseif ($do == "pwd" && $action == "post") {
-        if ($_POST["confirm"] == FRM_CONFIRM) {
-            if ($_POST["old_pwd"] == "")
+	elseif ($do == 'pwd' && $action == 'post') {
+        if ($_POST['confirm'] == FRM_CONFIRM) {
+            if ($_POST['old_pwd'] == '')
                 err_msg(ERROR, INS_OLD_PWD);
-            elseif ($_POST["new_pwd"] == "")
+            elseif ($_POST['new_pwd'] == '')
                 err_msg(ERROR, INS_NEW_PWD);
-            elseif ($_POST["new_pwd"] != $_POST["new_pwd1"])
+            elseif ($_POST['new_pwd'] != $_POST['new_pwd1'])
                 err_msg(ERROR, DIF_PASSWORDS);
             else {
-                $respwd = $db->query("SELECT * FROM users WHERE id = " . $uid . " AND password = '" . md5($_POST["old_pwd"]) . "' AND username = " . sqlesc(user::$current["username"]));
+                $respwd = $db->query("SELECT * FROM users WHERE id = " . $uid . " AND password = '" . md5($_POST['old_pwd']) . "' AND username = " . sqlesc(user::$current['username']));
 
-		if (!$respwd || $respwd->num_rows == 0)
+		        if (!$respwd || $respwd->num_rows == 0)
                     err_msg(ERROR, ERR_RETR_DATA);
                 else {
-                    $db->query("UPDATE users SET password = '" . md5($_POST["new_pwd"]) . "' WHERE id = " . $uid . " AND password = '" . md5($_POST["old_pwd"]) . "' AND username = " . sqlesc(user::$current["username"]));
+                    $db->query("UPDATE users SET password = '" . md5($_POST['new_pwd']) . "' WHERE id = " . $uid . " AND password = '" . md5($_POST['old_pwd']) . "' AND username = " . sqlesc(user::$current['username']));
 
-		    print("<p align='center'><b>" . PWD_CHANGED . "</b><br /><br />");
+		            print("<p align='center'><b>" . PWD_CHANGED . "</b><br /><br />");
                     print(NOW_LOGIN . "<br /><br />");
                     print("<a href='login.php'>Go</a><br /></p>");
                 }
             }
         } else
-            redirect("usercp.php?uid=" . $uid);
+            redirect('usercp.php?uid=' . $uid);
     }
 	elseif ($do == "user" && $action == "change") {
         block_begin(ACCOUNT_EDIT);
@@ -597,6 +612,7 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
                     MCached::del('language::list');
                     MCached::del('flag::list');
                     MCached::del('timezone::list');
+                    MCached::del('user::style::' . idstyle);
 
                     print("<p align='center'><b>" . INF_CHANGED . "</b><br /><br />");
                     print("<a href='usercp.php?uid=" . $uid . "'>" . BCK_USERCP . "</a><br /></p>");
@@ -656,20 +672,21 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
         $result = $db->query("SELECT pid FROM users WHERE id = " . user::$current['uid']);
         $row = $result->fetch_assoc();
 
-        $pid = $db->real_escape_string($row["pid"]);
+        $pid = $db->real_escape_string($row['pid']);
 
         if (!$pid) {
             $pid = md5(user::$current['uid'] + user::$current['username'] + user::$current['password'] + user::$current['lastconnect']);
             $res = $db->query("UPDATE users SET pid = '" . $pid . "' WHERE id = '" . user::$current['uid'] . "'");
         }
 
-        print("\n<form method='post' name='pid' action='usercp.php?do=pid_c&action=post&uid=" . $uid . "'><table class='lista' width='100%' align='center'>");
-        print("\n<tr><td class='header'>" . PID . ":</td><td class='lista'>" . $pid . "</td></tr>");
-        print("\n<tr><td class='header' align='center' colspan='2'><input type='submit' name='confirm' value='Reset PID'/>&nbsp;&nbsp;&nbsp;<input type='submit' name='confirm' value='" . FRM_CANCEL . "'/></td></tr>");
-        print("\n</table></form>");
-        print("<br />");
+        $smarty->assign('pid_uid', $uid);
+        $smarty->assign('pid', $pid);
+        $smarty->assign('lang_pid', PID);
+        $smarty->assign('lang_pid_cancel', FRM_CANCEL);
+
+        $smarty->display($STYLEPATH . '/tpl/user/usercp_change_pid.tpl');
+
         block_end();
-        print("<br />");
     }
 	elseif ($do == "pid_c" && $action == "post") {
         if ($_POST["confirm"] == "Reset PID") {
@@ -685,8 +702,12 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
         }
     } else {
         block_begin(WELCOME_UCP);
-        print("<center><br />" . UCP_NOTE_1 . "<br />" . UCP_NOTE_2 . "<br /><br />\n");
-        print("</center>");
+
+        $smarty->assign('usercp_note_1', UCP_NOTE_1);
+        $smarty->assign('usercp_note_2', UCP_NOTE_2);
+
+        $smarty->display($STYLEPATH . '/tpl/user/usercp_note.tpl');
+
         block_end();
 
         block_begin(CURRENT_DETAILS);
@@ -699,64 +720,79 @@ if (user::$current["uid"] != $uid || user::$current["uid"] == 1) {
             MCached::add('user::cp::' . $id, $row, 1800);
         }
 
-        print("<table class='lista' width='100%'>\n");
-        print("<tr>\n<td class='header'>" . USER_NAME . "</td>\n<td class='lista'>" . unesc(user::$current["username"]) . "</td>\n");
+        $smarty->assign('lang_usercp',
+                  array('username' => USER_NAME,
+                        'email' => EMAIL,
+                        'ip' => LAST_IP,
+                        'rank' => USER_LEVEL,
+                        'joined' => USER_JOINED,
+                        'lastaccess' => USER_LASTACCESS,
+                        'country' => PEER_COUNTRY,
+                        'downloaded' => DOWNLOADED,
+                        'uploaded' => UPLOADED,
+                        'ratio' => RATIO,
+                        'posts' => ''.FORUM . ' ' . POSTS . ''
+                       )
+                  );
 
-        if (user::$current["avatar"] && user::$current["avatar"] != "")
-            print("<td class='lista' align='center' valign='middle' rowspan='4'><img border='0' width='138' src='" . security::html_safe(user::$current["avatar"]) . "' /></td>");
+        $smarty->assign('usercp_username', unesc(user::$current['username']));
+        $smarty->assign('usercp_has_avatar', (user::$current['avatar'] && user::$current['avatar'] != ''));
+        $smarty->assign('usercp_avatar', security::html_safe(user::$current['avatar']));
+        $smarty->assign('usercp_is_staff', (user::$current['edit_users'] == 'yes' || user::$current['admin_access'] == 'yes'));
+        $smarty->assign('usercp_email', unesc(user::$current['email']));
+        $smarty->assign('usercp_ip', long2ip($row['lip']));
+        $smarty->assign('usercp_rank', unesc(user::$current['level']));
 
-        print("</tr>");
-
-        if (user::$current["edit_users"] == "yes" || user::$current["admin_access"] == "yes") {
-            print("<tr>\n<td class='header'>" . EMAIL . "</td>\n<td class='lista'>" . unesc(user::$current["email"]) . "</td></tr>\n");
-            print("<tr>\n<td class='header'>" . LAST_IP . "</td>\n<td class='lista'>" . long2ip($row["lip"]) . "</td></tr>\n");
-            print("<tr>\n<td class='header'>" . USER_LEVEL . "</td>\n<td class='lista'>" . unesc(user::$current["level"]) . "</td></tr>\n");
-
+        if (user::$current['edit_users'] == 'yes' || user::$current['admin_access'] == 'yes') {
             $colspan = " colspan='2'";
         } else {
-            print("<tr>\n<td class='header'>" . USER_LEVEL . "</td>\n<td class='lista'>" . unesc(user::$current["level"]) . "</td></tr>\n");
-
             $colspan = '';
         }
+        $smarty->assign('usercp_colspan', $colspan);
 
-        print("<tr>\n<td class='header'>" . USER_JOINED . "</td>\n<td class='lista'" . $colspan . ">" . (user::$current["joined"] == 0 ? "N/A" : get_date_time(user::$current["joined"])) . "</td></tr>\n");
-        print("<tr>\n<td class='header'>" . USER_LASTACCESS . "</td>\n<td class='lista'" . $colspan . ">" . (user::$current["lastconnect"] == 0 ? "N/A" : get_date_time(user::$current["lastconnect"])) . "</td></tr>\n");
-        print("<tr>\n<td class='header'>" . PEER_COUNTRY . "</td>\n<td class='lista' colspan='2'>" . ($row["flag"] == 0 ? "" : unesc($row['name'])) . "&nbsp;&nbsp;<img src='images/flag/" . (!$row["flagpic"] || $row["flagpic"] == "" ? "unknown.gif" : $row["flagpic"]) . "' alt='" . ($row["flag"] == 0 ? "Unknown" : unesc($row['name'])) . "' /></td></tr>\n");
-        print("<tr>\n<td class='header'>" . DOWNLOADED . "</td>\n<td class='lista' colspan='2'>" . misc::makesize((float)$row["downloaded"]) . "</td></tr>\n");
-        print("<tr>\n<td class='header'>" . UPLOADED . "</td>\n<td class='lista' colspan='2'>" . misc::makesize((float)$row["uploaded"]) . "</td></tr>\n");
+        $smarty->assign('usercp_joined', (user::$current['joined'] == 0 ? 'N/A' : get_date_time(user::$current['joined'])));
+        $smarty->assign('usercp_lastaccess', (user::$current['lastconnect'] == 0 ? 'N/A' : get_date_time(user::$current['lastconnect'])));
+        $smarty->assign('usercp_country', ($row['flag'] == 0 ? '' : unesc($row['name'])) . "&nbsp;&nbsp;<img src='images/flag/" . (!$row['flagpic'] || $row['flagpic'] == '' ? 'unknown.gif' : $row['flagpic']) . "' alt='" . ($row['flag'] == 0 ? 'Unknown' : unesc($row['name'])) . "' />");
+        $smarty->assign('usercp_downloaded', misc::makesize((float)$row['downloaded']));
+        $smarty->assign('usercp_uploaded', misc::makesize((float)$row['uploaded']));
 
-        if (intval($row["downloaded"]) > 0) {
-            $sr = (float)$row["uploaded"] / (float)$row["downloaded"];
+        if (intval($row['downloaded']) > 0) {
+            $sr = (float)$row['uploaded'] / (float)$row['downloaded'];
 
             if ($sr >= 4)
-                $s = "images/smilies/thumbsup.gif";
+                $s = 'images/smilies/smilebig.svg';
             else if ($sr >= 2)
-                $s = "images/smilies/grin.gif";
+                $s = 'images/smilies/smilegrin.svg';
             else if ($sr >= 1)
-                $s = "images/smilies/smile1.gif";
+                $s = 'images/smilies/smile.svg';
             else if ($sr >= 0.5)
-                $s = "images/smilies/noexpression.gif";
+                $s = 'images/smilies/plain.svg';
             else if ($sr >= 0.25)
-                $s = "images/smilies/sad.gif";
+                $s = 'images/smilies/sad.svg';
             else
-                $s = "images/smilies/thumbsdown.gif";
+                $s = 'images/smilies/crying.svg';
             $ratio = number_format($sr, 2) . "&nbsp;&nbsp;<img src='" . $s . "'>";
-        }
-		else
-            $ratio = "&infin;";
-        
-        print("<tr>\n<td class='header'>" . RATIO . "</td>\n<td class='lista' colspan='2'>" . $ratio . "</td></tr>\n");
+        } else
+            $ratio = '&infin;';
+
+        $smarty->assign('usercp_ratio', $ratio);
 
         // Only show if forum is internal
-        if ($GLOBALS["FORUMLINK"] == '' || $GLOBALS["FORUMLINK"] == 'internal') {
-            $sql  = $db->query("SELECT * FROM posts INNER JOIN users ON posts.userid = users.id WHERE users.id = " . user::$current["uid"]);
-            $posts = $sql->num_rows;
+        if ($GLOBALS['FORUMLINK'] == '' || $GLOBALS['FORUMLINK'] == 'internal') {
+            $posts = MCached::get('usercp::forum::posts::' . user::$current['uid']);
+            if ($posts === MCached::NO_RESULT) {
+                $sql  = $db->query("SELECT * FROM posts INNER JOIN users ON posts.userid = users.id WHERE users.id = " . user::$current['uid']);
+                $posts = $sql->num_rows;
+                MCached::add('usercp::forum::posts::' . user::$current['uid'], $posts, 1800);
+            }
 
             $memberdays = max(1, round((vars::$timestamp - $row['joined']) / 86400));
             $posts_per_day = number_format(round($posts / $memberdays, 2), 2);
-            print("<tr>\n<td class='header'>" . FORUM . " " . POSTS . ":</td>\n<td class='lista' colspan='2'>" . $posts . " &nbsp; [" . sprintf(POSTS_PER_DAY, $posts_per_day) . "]</td></tr>\n");
+            $smarty->assign('usercp_forum_posts', $posts . " &nbsp; [" . sprintf(POSTS_PER_DAY, $posts_per_day) . "]");
         }
-        print("</table>");
+
+        $smarty->display($STYLEPATH . '/tpl/user/usercp_main.tpl');
+
         block_end();
         // ------------------------
         block_begin(UPLOADED . " " . MNU_TORRENT);

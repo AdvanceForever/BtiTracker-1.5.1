@@ -24,6 +24,16 @@ if (isset($_GET["cid"]))
 else
     $cid = 0;
 
+//Links block in comments by Yupy...
+if ($GLOBALS['block_links'] == 'yes') {
+    if (preg_match ("/href|https|url|http|www|\.ro|\.ru|\.hu|\.it|\.eu
+                    |\.bg|\.gr|\.us|\.co.uk|\.uk|\.es|\.tv|\.tr|\.com.ro|\.be|\.de|\.gr|
+                    \.me|\.in|\.com|\.pirate|\.co|\.cc|\.net|\.info|\.org|\.ua|\.org/i", $comment))
+    //Give error 0_o
+    stderr(ERROR, LINKS_BLOCKED);
+}
+//Links block in comments by Yupy... 
+
 function comment_form() {
     global $comment, $id, $cid;
 

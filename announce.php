@@ -688,6 +688,19 @@ if ($LIVESTATS) {
 	else
 	    $newdown = $downloaded;
 
+        //Golden Torrents by CobraCRK
+        if ($GLOBALS['freeleech'] == 'yes') {
+            $t = MCached::get('is::freeleech::' . $info_hash);
+            if ($t === MCached::NO_RESULT) {
+                $q = $db->query("SELECT free FROM namemap WHERE info_hash = '" . $info_hash . "'");
+                $t = mysqli_result($q, 0, 'free');
+                MCached::add('is::freeleech::' . $info_hash, $t, 9600);
+            }
+            if ($t == 'yes') {
+                $newdown = 0;
+            }
+        }
+
 	quickquery("UPDATE users SET downloaded = IFNULL(downloaded, 0) + " . $newdown . ", uploaded = IFNULL(uploaded, 0) + " . $newup . " WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") . "");
     }
 
@@ -695,16 +708,27 @@ if ($LIVESTATS) {
 
     // begin history - also this is registred live or not
     if ($LOG_HISTORY) {
-	$resu = $db->query("SELECT id FROM users WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") . " ORDER BY lastconnect DESC LIMIT 1");
-
-        // if found at least one user should be 1
-	if ($resu && $resu->num_rows == 1) {
-	    $curuid = $resu->fetch_array(MYSQLI_BOTH);
-	    quickQuery("UPDATE history SET uploaded = IFNULL(uploaded, 0) + " . $newup . ", downloaded = IFNULL(downloaded, 0) + " . $newdown . " WHERE uid = " . (int)$curuid["id"] . " AND infohash = '" . $info_hash . "'");
-	}
-
-	$resu->free();
+    $resu = $db->query("SELECT id FROM users WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") ." ORDER BY lastconnect DESC LIMIT 1");
+    // if found at least one user should be 1
+    if ($resu && $resu->num_rows == 1) {
+        $curuid = $resu->fetch_array(MYSQLI_BOTH);
+        quickQuery("UPDATE history SET active = 'yes', agent = '" . getagent($agent, $peer_id) . "' WHERE uid = " . (int)$curuid['id'] . " AND infohash = '" . $info_hash . "'");
+	// Hit and run v2
+        if ($GLOBALS['hit_and_run'] == 'yes') {
+            if ($left > 0) {
+                quickQuery("UPDATE history SET completed = 'no', seed = 0 WHERE uid = " . (int)$curuid['id'] . " AND infohash = '" . $info_hash . "'");
+            } else {
+                quickQuery("UPDATE history SET completed = 'yes' WHERE uid = " . (int)$curuid['id'] . " AND infohash = '" . $info_hash . "'");
+	    }
+        }
+	// Hit and run v2
+        // record is not present, create it (only if not seeder: original seeder don't exist in history table, other already exists)
+        if ($db->affected_rows == 0 && $left > 0)
+            quickQuery("INSERT INTO history (uid, infohash, active, agent) VALUES (" . (int)$curuid['id'] . ", '" . $info_hash . "', 'yes', '" . getagent($agent, $peer_id) . "')");
+        }
+        $resu->free();
     }
+    // end history
 }
 
 switch ($event) {
@@ -752,6 +776,19 @@ switch ($event) {
 
 	sendPeerList($peers);
 
+        //Golden Torrents by CobraCRK
+        if ($GLOBALS['freeleech'] == 'yes') {
+            $t = MCached::get('is::freeleech::' . $info_hash);
+            if ($t === MCached::NO_RESULT) {
+                $q = $db->query("SELECT free FROM namemap WHERE info_hash = '" . $info_hash . "'");
+                $t = mysqli_result($q, 0, 'free');
+                MCached::add('is::freeleech::' . $info_hash, $t, 9600);
+            }
+            if ($t == "yes") {
+                $downloaded = 0;
+            }
+        }
+
 	// update user uploaded/downloaded
 	if (!$LIVESTATS)
 	    @$db->query("UPDATE users SET uploaded = IFNULL(uploaded, 0) + " . $uploaded . ", downloaded = IFNULL(downloaded, 0) + " . $downloaded . " WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") . " AND id > 1 LIMIT 1");
@@ -793,25 +830,26 @@ switch ($event) {
 	sendPeerList($peers);
 
 	// begin history
-	if ($LOG_HISTORY) {
-	    $resu = $db->query("SELECT id FROM users WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") . " ORDER BY lastconnect DESC LIMIT 1");
-
-	    // if found at least one user should be 1
-	    if ($resu && $resu->num_rows == 1) {
-		$curuid = $resu->fetch_array(MYSQLI_BOTH);
-
-		// if user has already completed this torrent, mysql will give error because of unique index (uid+infohash)
-		// upload/download will be updated on stop event...
-		// record should already exist (created on stated event)
-		quickQuery("UPDATE history SET date = UNIX_TIMESTAMP(), active = 'yes', agent = '" . getagent($agent, $peer_id) . "' WHERE uid = " . (int)$curuid["id"] . " AND infohash = '" . $info_hash . "'");
-
-		// record is not present, create it
-		if ($db->affected_rows == 0)
-		    quickQuery("INSERT INTO history (uid, infohash, date, active, agent) VALUES (" . (int)$curuid["id"] . ", '" . $info_hash . "', UNIX_TIMESTAMP(), 'yes', '" . getagent($agent, $peer_id) . "')");
-	    }
-
-	    $resu->free();
-	}
+        if ($LOG_HISTORY) {
+            $resu = $db->query("SELECT id FROM users WHERE " . ($PRIVATE_ANNOUNCE ? "pid = '" . $pid . "'" : "cip = '" . $ip . "'") ." ORDER BY lastconnect DESC LIMIT 1");
+            // if found at least one user should be 1
+            if ($resu && $resu->num_rows == 1) {
+                $curuid = $resu->fetch_array(MYSQLI_BOTH);
+                // if user has already completed this torrent, mysql will give error because of unique index (uid+infohash)
+                // upload/download will be updated on stop event...
+                // record should already exist (created on stated event)
+	        // Hit and run v2 - Start
+                if ($GLOBALS['hit_and_run'] == 'yes') {
+                    quickQuery("UPDATE history SET date = UNIX_TIMESTAMP(), active = 'yes', completed = 'yes', agent = '" . getagent($agent, $peer_id) . "' WHERE uid = " . (int)$curuid['id'] . " AND infohash = '" . $info_hash . "'");
+                }
+	        // Hit and run v2 - Ends
+                // record is not present, create it
+                if ($db->affected_rows == 0)
+                    quickQuery("INSERT INTO history (uid, infohash, date, active, completed, agent, downloaded, uploaded) VALUES (" . (int)$curuid['id'] . ", '" . $info_hash . "', UNIX_TIMESTAMP(), 'yes', 'yes', '" . getagent($agent, $peer_id) . "', " . $downloaded . ", " . $uploaded . ")");
+            }
+            $resu->free();
+    }
+    // end history
     break;
 
     // client sent no event

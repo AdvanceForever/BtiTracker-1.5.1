@@ -5,13 +5,75 @@
 
 html, body {
 	height: 100%;
+        width: 100%;
 }
 
 body {
 	background-color: #343434;
 	font-family: Bitstream Vera Sans, Tahoma, sans-serif;
-	font-size: 11px;
-	color: #757575;
+	font-size: 12px;
+	color: white;
+        position: fixed;
+}
+
+
+
+.btn {
+    box-shadow: 0px 10px 14px -7px #3E7327;
+    background: #77B55A linear-gradient(to bottom, #77B55A 5%, #72B352 100%) repeat scroll 0% 0%;
+    border-radius: 4px;
+    border: 1px solid #4B8F29;
+    display: inline-block;
+    cursor: pointer;
+    color: #FFF;
+    font-family: Arial;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 12px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #5B8A3C;
+}
+
+
+
+.glass {
+    border: medium none !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 7px !important;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.5) !important;
+    padding: 24px;
+}
+
+.fullscreen-bg {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    z-index: -100;
+}
+
+.fullscreen-bg__video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (min-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    width: auto;
+    height: 100%;
+  }
 }
 
 table {
@@ -51,7 +113,8 @@ a:hover {
 
 #maincontent {
 	width: 100%;
-	height: 88%;
+	height: 100%;
+        margin-top: -100px;
 }
 
 #logo {

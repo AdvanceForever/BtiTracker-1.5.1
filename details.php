@@ -76,20 +76,35 @@ if (user::$current["uid"] > 1 && (user::$current["uid"] == $row["uploader"] || u
     print("<a href='delete.php?info_hash=" . $row["info_hash"] . "&amp;returnto=" . urlencode("torrents.php") . "'>" . image_or_link($STYLEPATH . "/delete.gif", "", DELETE) . "</a>");
 }
 
-print("</td><td class='lista' align='center'>" . security::html_safe($cache["filename"]) . "</td></tr>\n");
-print("<tr><td align='right' class='header'> " . TORRENT . ":</td><td class='lista' align='center'><a href='download.php?id=" . $row["info_hash"] . "&f=" . rawurlencode($cache["filename"]) . ".torrent'>" . security::html_safe($cache["filename"]) . "</a></td></tr>\n");
-print("<tr><td align='right' class='header'> " . INFO_HASH . ":</td><td class='lista' align='center'>" . security::html_safe($row["info_hash"]) . "</td></tr>\n");
+print("</td><td class='lista' align='left'>" . security::html_safe($cache["filename"]) . "</td></tr>\n");
+print("<tr><td align='right' class='header'> " . TORRENT . ":</td><td class='lista' align='left'><a href='download.php?id=" . $row["info_hash"] . "&f=" . rawurlencode($cache["filename"]) . ".torrent'>" . security::html_safe($cache["filename"]) . "</a></td></tr>\n");
+print("<tr><td align='right' class='header'> " . INFO_HASH . ":</td><td class='lista' align='left'>" . security::html_safe($row["info_hash"]) . "</td></tr>\n");
+
+if ($GLOBALS['image_link'] == 'yes') {
+    $row1 = MCached::get('torrent::details::image::' . $id);
+    if ($row1 === MCached::NO_RESULT) {
+        $res1 = $db->query("SELECT image FROM namemap WHERE info_hash = '" . $id . "'") or die($db->error);
+        $row1 = $res1->fetch_array(MYSQLI_BOTH);
+        MCached::add('torrent::details::' . $id, $row1, 43200);
+    }
+
+    if (!empty($row1['image'])) {
+        print("<tr><td align='right' class='header'>Image:</td><td class='lista' align='left'><img src='" . security::html_safe($row1['image']) . "' width='200'></a></td></tr>\n");
+    } else {
+        print("<tr><td align='right' class='header'>Image:</td><td class='lista' align='left'>No Image Provided!</a></td></tr>\n");
+    }
+}
 
 if (!empty($cache["comment"]))
-    print("<tr><td align='right' class='header'> " . DESCRIPTION . ":</td><td align='center' class='lista'>" . format_comment(unesc($cache["comment"])) . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . DESCRIPTION . ":</td><td align='left' class='lista'>" . format_comment(unesc($cache["comment"])) . "</td></tr>\n");
 
 if (isset($row["cat_name"]))
-    print("<tr><td align='right' class='header'> " . CATEGORY_FULL . ":</td><td class='lista' align='center'>" . security::html_safe(unesc($row["cat_name"])) . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . CATEGORY_FULL . ":</td><td class='lista' align='left'>" . security::html_safe(unesc($row["cat_name"])) . "</td></tr>\n");
 else
-    print("<tr><td align='right' class='header'> " . CATEGORY_FULL . ":</td><td class='lista' align='center'>(None)</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . CATEGORY_FULL . ":</td><td class='lista' align='left'>(None)</td></tr>\n");
 
 // rating
-print("<tr><td align='right' class='header'> " . RATING . ":</td><td class='lista' align='center'>\n");
+print("<tr><td align='right' class='header'> " . RATING . ":</td><td class='lista' align='left'>\n");
 
 $vres = $db->query("SELECT SUM(rating) AS totrate, COUNT(*) AS votes FROM ratings WHERE infohash = '" . $id . "'");
 $vrow = @$vres->fetch_array(MYSQLI_BOTH);
@@ -149,7 +164,7 @@ if ($row["username"] != user::$current["username"] && user::$current["uid"] > 1)
 }
 print $s;
 print("</td></tr>\n");
-print("<tr><td align=right class='header'> " . SIZE . ":</td><td class='lista' align='center'>" . misc::makesize((float)$cache["size"]) . "</td></tr>\n");
+print("<tr><td align=right class='header'> " . SIZE . ":</td><td class='lista' align='left'>" . misc::makesize((float)$cache["size"]) . "</td></tr>\n");
 
 // files in torrent - by Lupin 20/10/05
 ?>
@@ -193,7 +208,7 @@ if (file_exists($row["url"])) {
             print("\n<tr>\n<td align='left' class='lista'>" . security::html_safe($thefile["name"]) . "</td>\n<td align='right' class='lista'>" . misc::makesize((int)$thefile["length"]) . "</td></tr>\n");
         } elseif (isset($thefile["files"])) {
             foreach ($thefile["files"] as $singlefile) {
-                print("\n<tr>\n<td align='left' class='lista'>" . security::html_safe(implode("/", $singlefile["path"])) . "</td>\n<td align='right' class='lista'>" . misc::makesize((int)$singlefile["length"]) . "</td></tr>\n");
+                print("\n<tr>\n<td align='left' class='lista'>" . security::html_safe(implode("/", $singlefile["path"])) . "</td>\n<td align='left' class='lista'>" . misc::makesize((int)$singlefile["length"]) . "</td></tr>\n");
                 $numfiles++;
             }
         } else {
@@ -207,7 +222,7 @@ if (file_exists($row["url"])) {
 // end files in torrents
 
 include(INCL_PATH . 'offset.php');
-print("<tr><td align='right' class='header'> " . ADDED . ":</td><td class='lista' align='center'>" . date("d/m/Y H:m:s", $row["data"] - $offset) . "</td></tr>\n");
+print("<tr><td align='right' class='header'> " . ADDED . ":</td><td class='lista' align='left'>" . date("d/m/Y H:m:s", $row["data"] - $offset) . "</td></tr>\n");
 
 if ($row["anonymous"] == "true") {
     if (user::$current["edit_torrents"] == "yes")
@@ -217,7 +232,7 @@ if ($row["anonymous"] == "true") {
 } else
     $uploader = "<a href=userdetails.php?id=" . (int)$row['uploader'] . ">" . security::html_safe($row["username"]) . "</a>";
 
-print("<tr><td align='right' class='header'>" . UPLOADER . ":</td><td class='lista' align='center'>" . $uploader . "</td></tr>\n");
+print("<tr><td align='right' class='header'>" . UPLOADER . ":</td><td class='lista' align='left'>" . $uploader . "</td></tr>\n");
 
 if ($row["speed"] < 0) {
     $speed = "N/A";
@@ -227,46 +242,109 @@ if ($row["speed"] < 0) {
     $speed = round((int)$row["speed"] / 1024, 2) . " KiB per sec";
 }
 
-print("<tr><td align='right' class='header'> " . SPEED . ":</td><td class='lista' align='center'>" . $speed . "</td></tr>\n");
+print("<tr><td align='right' class='header'> " . SPEED . ":</td><td class='lista' align='left'>" . $speed . "</td></tr>\n");
 
 if ($row["external"] == "no") {
-    print("<tr><td align='right' class='header'> " . DOWNLOADED . ":</td><td class='lista' align='center'><a href='torrent_history.php?id=" . $row["info_hash"] . "'>" . (int)$row["finished"] . "</a> " . X_TIMES . "</td></tr>\n");
-    print("<tr><td align='right' class='header'> " . PEERS . ":</td><td class='lista' align='center'>" . SEEDERS . ": <a href='peers.php?id=" . $row["info_hash"] . "'>" . (int)$row["seeds"] . "</a>, " . LEECHERS . ": <a href='peers.php?id=" . $row["info_hash"] . "'>" . (int)$row["leechers"] . "</a> = <a href='peers.php?id=" . $row["info_hash"] . "'>" . ((int)$row["leechers"] + (int)$row["seeds"]) . "</a> " . PEERS . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . DOWNLOADED . ":</td><td class='lista' align='left'><a href='torrent_history.php?id=" . $row["info_hash"] . "'>" . (int)$row["finished"] . "</a> " . X_TIMES . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . PEERS . ":</td><td class='lista' align='left'>" . SEEDERS . ": <a href='peers.php?id=" . $row["info_hash"] . "'>" . (int)$row["seeds"] . "</a>, " . LEECHERS . ": <a href='peers.php?id=" . $row["info_hash"] . "'>" . (int)$row["leechers"] . "</a> = <a href='peers.php?id=" . $row["info_hash"] . "'>" . ((int)$row["leechers"] + (int)$row["seeds"]) . "</a> " . PEERS . "</td></tr>\n");
 } else {
-    print("<tr><td align='right' class='header'> " . DOWNLOADED . ":</td><td class='lista' align='center'>" . (int)$row["finished"] . " " . X_TIMES . "</td></tr>\n");
-    print("<tr><td align='right' class='header'> " . PEERS . ":</td><td class='lista' align='center'>" . SEEDERS . ": " . (int)$row["seeds"] . ", " . LEECHERS . ": " . (int)$row["leechers"] . " = " . ((int)$row["leechers"] + (int)$row["seeds"]) . " " . PEERS . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . DOWNLOADED . ":</td><td class='lista' align='left'>" . (int)$row["finished"] . " " . X_TIMES . "</td></tr>\n");
+    print("<tr><td align='right' class='header'> " . PEERS . ":</td><td class='lista' align='left'>" . SEEDERS . ": " . (int)$row["seeds"] . ", " . LEECHERS . ": " . (int)$row["leechers"] . " = " . ((int)$row["leechers"] + (int)$row["seeds"]) . " " . PEERS . "</td></tr>\n");
 }
 
 if ($row["external"] == "yes") {
-    print("<tr><td valign='middle' align='right' class='header'><a href='details.php?act=update&id=" . $row["info_hash"] . "&surl=" . urlencode($row["announce_url"]) . "'>" . UPDATE . "</a></td><td class='lista' align='center'><b>EXTERNAL</b><br />" . security::html_safe($row["announce_url"]) . "</td></tr>\n");
-    print("<tr><td valign='middle' align='right' class='header'>" . LAST_UPDATE . "</td><td class='lista' align='center'>" . get_date_time($row["lastupdate"]) . "</td></tr>\n");
+    print("<tr><td valign='middle' align='left' class='header'><a href='details.php?act=update&id=" . $row["info_hash"] . "&surl=" . urlencode($row["announce_url"]) . "'>" . UPDATE . "</a></td><td class='lista' align='center'><b>EXTERNAL</b><br />" . security::html_safe($row["announce_url"]) . "</td></tr>\n");
+    print("<tr><td valign='middle' align='left' class='header'>" . LAST_UPDATE . "</td><td class='lista' align='center'>" . get_date_time($row["lastupdate"]) . "</td></tr>\n");
 }
 print("</table>\n");
 print("<a name='comments' /></a>");
+
 // comments...
-$subres = $db->query("SELECT comments.id, text, UNIX_TIMESTAMP(added) AS data, user, users.id AS uid FROM comments LEFT JOIN users ON comments.user = users.username WHERE info_hash = '" . $id . "' ORDER BY added ASC");
+if ($GLOBALS['custom_title'] == 'yes') {
+    $ctitle = 'users.custom_title,';
+} else {
+    $ctitle = '';
+}
+
+$subres = $db->query("SELECT users.custom_title, editedby, editedat, UNIX_TIMESTAMP(lastconnect) AS lastconnect, comments.id, text, UNIX_TIMESTAMP(added) AS data, user, " . $ctitle . " users.id AS uid FROM comments LEFT JOIN users ON comments.user = users.username WHERE info_hash = '" . $id . "' ORDER BY added ASC");
 if (!$subres || $subres->num_rows == 0) {
     if (user::$current["uid"] > 1)
-        $s = "<br /><br />\n<table width='95%' class='lista'>\n<tr>\n<td align='center'>\n<a href='comment.php?id=" . $id . "&usern=" . urlencode(user::$current["username"]) . "'>" . NEW_COMMENT . "</a>\n</td>\n</tr>\n";
+        $s = "<br />\n<table width='95%' class='lista'>\n<tr>\n<td align='center'>\n<a href='comment.php?id=" . $id . "&usern=" . urlencode(user::$current["username"]) . "'>" . NEW_COMMENT . "</a>\n</td>\n</tr>\n";
     else
-        $s = "<br /><br />\n<table width='95%' class='lista'>\n";
+        $s = "<br />\n<table width='95%' class='lista'>\n";
 
     $s .= "<tr>\n<td class='lista' align='center'>" . NO_COMMENTS . "</td>\n</tr>\n";
     $s .= "</table>\n";
 } else {
-    print("<br /><br />");
+    print("<br />");
     if (user::$current["uid"] > 1)
-        $s = "<br /><br />\n<table width='95%' class='lista'><tr><td colspan='3' align='center'><a href='comment.php?id=" . $id . "&usern=" . urlencode(user::$current["username"]) . "'>" . NEW_COMMENT . "</a></td></tr>\n";
+        $s = "<br />\n<table width='95%' class='lista' cellspacing='0'><tr><td colspan='3' align='center'><a href='comment.php?id=" . $id . "&usern=" . urlencode(user::$current["username"]) . "'>" . NEW_COMMENT . "</a></td></tr>\n";
     else
-        $s = "<br /><br />\n<table width='95%' class='lista'>\n";
+        $s = "<br />\n<table width='95%' class='lista' cellspacing='0'>\n";
 
     while ($subrow = $subres->fetch_array(MYSQLI_BOTH)) {
-        $s .= "<tr><td class='header'><a href='userdetails.php?id=" . (int)$subrow["uid"] . "'>" . security::html_safe($subrow["user"]) . "</a></td><td class='header'>" . date("d/m/Y H.i.s", $subrow["data"] - $offset) . "</td>\n";
-        // only users able to delete torrents can delete comments...
-        if (user::$current["delete_torrents"] == "yes")
-            $s .= "<td class='header' align='right'><a onclick='return confirm('" . str_replace("'", "\'", DELETE_CONFIRM) . "')' href='comment.php?id=$id&cid=" . $subrow["id"] . "&action=delete'>" . image_or_link($STYLEPATH . "/delete.png", "", DELETE) . "</a></td>\n";
-        $s .= "</tr>\n";
-        $s .= "<tr><td colspan='3' class='lista' align='center'>" . format_comment(unesc($subrow["text"])) . "</td></tr>\n";
+        //Custom Title System Hack Start
+        if ($GLOBALS['custom_title'] == 'yes') {
+            $lvl = MCached::get('comments::level::' . $subrow['uid']);
+            if ($lvl === MCached::NO_RESULT) {
+                $level = $db->query("SELECT level FROM users_level WHERE id_level = '" . (int)$subrow['id_level'] . "'");
+                $lvl = $level->fetch_assoc();
+                MCached::add('comments::level::' . $subrow['uid'], $lvl, 300);
+            }
+
+            if (!$subrow['uid'])
+                $title = 'Orphaned';
+            elseif (!$subrow['custom_title'])
+                $title = security::html_safe($lvl['level']);
+            else
+                $title = unesc($subrow['custom_title']);
+
+            $display_title = '(' . $title . ')';
+        } else {
+            $display_title = '';
+        }
+        //Custom Title System Hack Stop
+
+        include(INCL_PATH . 'offset.php');
+
+        $s .= "<tr><td class='header'><a href='userdetails.php?id=" . (int)$subrow['uid'] . "'>" . security::html_safe($subrow['user']) . "</a>" . Warn_disabled($subrow['uid']) . " " . $display_title . "</td><td class='header'>" . date('d/m/Y H.i.s', unesc($subrow['data']-$offset)) . "</td>\n";
+
+        if (user::$current['admin_access'] == 'yes' || user::$current['edit_forum'] == 'yes' || user::$current['delete_torrents'] == 'yes') {
+	    $s .= "<td class='header' align='right'><a onclick='return confirm' href='edit_comment.php?do=comments&action=quote&id=" . (int)$subrow['id'] . "'>" . image_or_link($STYLEPATH . '/f_quote.png', '', '[' . QUOTE . ']') . "</a>&nbsp;<a href='edit_comment.php?do=comments&action=edit&id=" . (int)$subrow['id'] . "'>" . image_or_link($STYLEPATH . '/f_edit.png', '', '[' . EDIT . ']') . "</a>&nbsp;<a onclick='return confirm('" . str_replace("'", "\'", DELETE_CONFIRM) . "')' href='comment.php?id=" . $id . "&cid=" . (int)$subrow['id'] . "&action=delete'>" . image_or_link($STYLEPATH . '/f_delete.png', '', '[' . DELETE . ']') . "</a></td>\n";
+        }
+	elseif ($subrow['user'] == user::$current['username']) {
+	    $s .= "<td class='header' align='right'><a onclick='return confirm' href='edit_comment.php?do=comments&action=quote&id=" . (int)$subrow['id'] . "'>" . image_or_link($STYLEPATH . '/f_quote.png', '', '[' . QUOTE . ']') . "</a>&nbsp;<a href='edit_comment.php?do=comments&action=edit&id=" . (int)$subrow['id'] . "'>" . image_or_link($STYLEPATH . '/f_edit.png', '', '[' . EDIT . ']') . "</a></td>\n";		
+	}
+	elseif (user::$current['view_torrents'] == 'yes') {
+	    $s .= "<td class='header' align='right'><a onclick='return confirm' href='edit_comment.php?do=comments&action=quote&id=" . (int)$subrow['id'] . "'>" . image_or_link($STYLEPATH . '/f_quote.png', '', '[' . QUOTE . ']') . "</a></td>\n";
+	}
+
+        $s .= '</tr>';
+
+        $avatar = ($subrow['avatar'] && $subrow['avatar'] != '' ? security::html_safe($subrow['avatar']) : 'images/default_avatar.png');
+
+        $s .= "<tr><td class='lista' width='15%' align='center'><img width='150' border='0' src='" . $avatar . "'></td><td valign='top' colspan='3' class='lista'>" . format_comment($subrow['text']) . "</td></tr>\n";
+		   
+        $last = unesc($subrow['lastconnect']);
+        $online = vars::$timestamp;
+        $online -= 60 * 15;
+
+        if ($last > $online) {
+            $online = "<font color='lime'>Online</font>";
+        } else {
+            $online = "<font color='red'>Offline</font>";
+        }
+
+        if (is_valid_id($subrow['editedby'])) {
+            $res2 = $db->query("SELECT username FROM users WHERE id = " . (int)$subrow['editedby']);
+            if ($res2->num_rows == 1) {
+                $userrow = $res2->fetch_assoc();
+
+		$s .= "<tr align='right'><td width='90%' colspan='3' valign='bottom' class='lista' align='right' border='0'>" . $online . "&nbsp;&nbsp;<font size='1' class='small'>" . LAST_EDITED_BY . " <a href='userdetails.php?id=" . (int)$subrow['editedby'] . "'><b>" . security::html_safe($userrow['username']) . "</b></a> at " . date('d/m/Y H.i.s', unesc($subrow['editedat']-$offset)) . "</font>&nbsp;&nbsp;<a class='postlink' href='#comments'>" . image_or_link('./images/top.gif', '', 'TOP') . "</a></td></tr>\n";
+            }
+        } else {
+            $s .= "<tr align='right'><td width='90%' colspan='3' valign='bottom' class='lista' align='right' border='0'>" . $online . "&nbsp;&nbsp;<font size='1' class='small'>" . date('d/m/Y H.i.s', unesc($subrow['data']-$offset)) . "</font>&nbsp;&nbsp;<a class='postlink' href='#comments'>" . image_or_link('./images/top.gif', '', 'TOP') . "</a></td></tr>\n";
+        }
     }
     $s .= "</table>\n";
 }

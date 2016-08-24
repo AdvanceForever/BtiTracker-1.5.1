@@ -1,21 +1,26 @@
 <link rel='shortcut icon' href='favicon.ico' />
 <link href='style/base/home.css' rel='stylesheet' type='text/css' />
 
-<!--Page by What.CD-->
-<div id='head'>
+<div class="fullscreen-bg">
+    <video loop muted autoplay class="fullscreen-bg__video">
+        <source src="images/raindrops.webm" type="video/webm">
+        <source src="images/raindrops.mp4" type="video/mp4">
+        <source src="images/raindrops.ogv" type="video/ogg">
+    </video>
 </div>
-<table class='layout' id='maincontent' style='border-top: solid 1px #3399FF; border-bottom: solid 1px #3399FF;'>
+
+<table class='layout' id='maincontent'>
 <tr>
     <td align='center' valign='middle'>
     <div id='logo'>
        <ul>
-	  <li><a href='account.php'>Signup</a></li>
-	  <li><a href='recover.php'>Recover</a></li>
+	  <li><a href='account.php'><b>Signup</b></a></li>
+	  <li><a href='recover.php'><b>Recover</b></a></li>
         </ul>
      </div>
 
 <form method='post' action='login.php?returnto={$returno}'>
-<table class='layout'>
+<table class='layout glass'>
 <tr>
     <td>Username&nbsp;</td>
     <td colspan='2'>
@@ -34,15 +39,12 @@
        <input type='checkbox' id='keeplogged' name='keeplogged' value='1' />
        <label for='keeplogged'>Remember me</label>
     </td>
-    <td><input type='submit' name='login' value='Log in' class='submit' /></td>
+    <td><input type='submit' name='login' value='Log in' class='btn' /></td>
 </tr>
 </table>
 </form>
-
+<br style='line-height: 4px;'>
+Powered by BtiTracker (1.5.14) By <a href='https://github.com/Yupy/BtiTracker-1.5.1'>Yupy</a> &amp; <a href='http://www.btiteam.org'>BTiTeam</a>
     </td>
 </tr>
 </table>
-
-<div id='foot'>
-    <span><a href='http://www.btiteam.org' target='_blank'>BtiTeam.org</a> | <a href='https://github.com/Yupy/BtiTracker-1.5.1' target='_blank'>GitHub.com</a> | <a href='#'>BtiTracker v1.5.1 by Yupy &amp; Btiteam</a></span>
-</div>

@@ -5,11 +5,10 @@
 * Updated and Maintained by Yupy.
 * Copyright (C) 2004-2015 Btiteam.org
 */
-
 global $sp_compact, $pid;
 
-$uploaded	= isset($_GET['uploaded']) ? 0 + (int)$_GET['uploaded'] : 0;
-$downloaded	= isset($_GET['downloaded']) ? 0 + (int)$_GET['downloaded'] : 0;
+$uploaded = isset($_GET['uploaded']) ? 0 + (int)$_GET['uploaded'] : 0;
+$downloaded = isset($_GET['downloaded']) ? 0 + (int)$_GET['downloaded'] : 0;
 $left = isset($_GET['left']) ? 0 + (int)$_GET['left'] : 0;
 $iscompact = $sp_compact ? (bool)(0 + $_GET['compact'] == '1') : false;
 $port = isset($_GET['port']) ? 0 + (int)$_GET['port'] : 0;

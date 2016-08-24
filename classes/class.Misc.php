@@ -33,6 +33,23 @@ class misc {
 		}
 		return number_format($Size, $Levels) . $Units[$Steps];
 	}
+
+    public static function version() {
+        global $time_start, $gzip, $PRINT_DEBUG, $tracker_version, $tracker_rev, $STYLEPATH, $smarty;
+	
+        $time_end = get_microtime();
+        $max_mem = memory_get_peak_usage();
+
+        $smarty->assign('print_debug', $PRINT_DEBUG);
+        $smarty->assign('execution_time', number_format(($time_end - $time_start), 4));
+        $smarty->assign('memcached_queries_count', MCached::$count);
+        $smarty->assign('memcached_queries_time', round(MCached::$time, 4));
+        $smarty->assign('memory_usage', self::makesize($max_mem));
+        $smarty->assign('tracker_version', $tracker_version);
+        $smarty->assign('tracker_revision', $tracker_rev);
+	
+        $smarty->display($STYLEPATH . '/tpl/tracker/tracker_version.tpl');
+   }
 	
         public static function time_ago($timestamp) {
                 $timestamp = (int)$timestamp;
@@ -119,12 +136,14 @@ class misc {
 	
 	public static function pager($rpp, $count, $href, $options = 0, $pagename = 'page') {
 		$show_pages		= (bool)($options & self::PAGER_SHOW_PAGES);
-		$no_sep				= (bool)($options & self::PAGER_NO_SEPARATOR);
+		$no_sep			= (bool)($options & self::PAGER_NO_SEPARATOR);
 		$lastpagedefault	= (bool)($options & self::PAGER_LAST_PAGE_DEFAULT);
-		$no_nav				= (bool)($options & self::PAGER_NO_NAV);
-		$only_pages			= (bool)($options & self::PAGER_ONLY_PAGES);
+		$no_nav			= (bool)($options & self::PAGER_NO_NAV);
+		$only_pages		= (bool)($options & self::PAGER_ONLY_PAGES);
 
-		$pages = ceil($count / $rpp);
+                if ($count != 0){
+		    $pages = ceil($count / $rpp);
+                }
 
 		if ($only_pages)
 			$dpage = ceil($pages / 2);

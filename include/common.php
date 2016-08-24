@@ -37,6 +37,33 @@ function mysqli_result($res, $row, $field = 0) {
     return $datarow[$field];
 }
 
+#Timed Ranks by Diemthuy Adapted by Yupy for BtitTracker
+function get_combodt($select, $opts = array()) {
+    $name = (isset($opts['name'])) ?' name = "' . security::html_safe($opts['name']) . '"' : '';
+    $complete = (isset($opts['complete'])) ? (bool)$opts['complete'] : false;
+    $default = (isset($opts['default'])) ? $opts['default'] : NULL;
+    $id = (isset($opts['id'])) ? (int)$opts['id'] : 'id';
+    $value = (isset($opts['value'])) ? $opts['value'] : 'value';
+    $combo = '';
+
+    if ($complete)
+        $combo .= '<select'.$name.'>';
+
+    foreach ($select as $option) {
+        $combo .= "\n".'<option ';
+
+        if ( (!is_null($default)) && ($option[$id] == $default) )
+            $combo .= 'selected="selected" ';
+
+        $combo .= 'value="' . $option[$id] . '">' . security::html_safe(unesc($option[$value])) . '</option>';
+    }
+
+    if ($complete)
+        $combo .= '</select>';
+
+    return $combo;
+}
+
 if (!function_exists('hex2bin')) {
     function hex2bin($input, $assume_safe = true) {
         if ($assume_safe !== true && !((strlen($input) % 2) === 0 || preg_match('/^[0-9a-f]+$/i', $input)))

@@ -68,7 +68,7 @@ if (!user::$current || user::$current["view_torrents"] == "no") {
     $traffic = misc::makesize($dled + $upld);
 	
     
-    print("<tr><td class='blocklist' align='center'>\n");
+    print("<tr><td class='lista' align='center'>\n");
     print("<table width='100%' cellspacing='2' cellpading='2'>\n");
     print("<tr>\n<td colspan='2' align='center'><u>" . unesc($SITENAME) . "</u></td></tr>\n");
     print("<tr><td align='left'>" . MEMBERS . ":</td><td align='right'>" . $users . "</td></tr>\n");

@@ -26,7 +26,7 @@ if (!$aid || empty($aid) || $aid == 0 || !$arandom || empty($arandom) || $arando
     exit;
 }
 
-$mqry = $db->query("SELECT users.id FROM users INNER JOIN users_level ON users_level.id = users.id_level WHERE users.id = " . $aid . " AND random = " . $arandom . " AND admin_access = 'yes' AND username = " . sqlesc(user::$current["username"]) . "");
+$mqry = $db->query("SELECT users.id FROM users INNER JOIN users_level ON users_level.id = users.id_level WHERE users.id = " . $aid . " AND random = " . $arandom . " AND admin_access = 'yes' AND username = " . sqlesc(user::$current["username"]));
 if ($mqry->num_rows < 1) {
     standardheader('Access Denied');
     err_msg(ERROR, NOT_ADMIN_CP_ACCESS);
@@ -103,19 +103,43 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
     print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=pruneu'>Prune Users</a></td>");
     print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=logview'>View Sitelog</a></td>");
     print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=searchdiff'>Search Diff.</a></td>");
+
+    if ($GLOBALS['duplicate_ips'] == 'yes') {
+        print("\n<td class='header' align='center'><a href='admin.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&action=duplicateips'>Duplicate IP's</a></td>");
+    }
+
+    if ($GLOBALS['hit_and_run'] == 'yes') {
+        print("\n<td class='header' align='center'><a href='admin.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&action=hitrun'>Hit &amp; Run Settings</a></td>");
+    }
+
+    //User Warning System Hack Start
+    if ($GLOBALS['warn_system'] == 'yes') {
+        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=warnedu'>" . ACP_WARNEDU . "</a></td>");
+        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=prevwarnedu'>" . ACP_PREVWARNEDU . "</a></td>");
+        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=disabledu'>" . ACP_DISABLEDU . "</a></td>");
+    }
+    //User Warning System Hack Stop
+
+
     print("\n</tr></table>\n");
     
-    if ($do == "prunet") {
-        include(INCL_PATH . 'prune_torrents.php');
-    } elseif ($do == "pruneu") {
-        include(INCL_PATH . 'prune_users.php');
-    } elseif ($do == "masspm") {
-        include(INCL_PATH . 'masspm.php');
-    } elseif ($do == "logview") {
-        include(INCL_PATH . 'sitelog.php');
-    } elseif ($do == "searchdiff") {
-        include(INCL_PATH . 'searchdiff.php');
-    } elseif ($do == "config" && $action == "read") {
+    if ($do == 'prunet') {
+        include(ADMIN_PATH . 'prune_torrents.php');
+    } elseif ($do == 'pruneu') {
+        include(ADMIN_PATH . 'prune_users.php');
+    } elseif ($do == 'masspm') {
+        include(ADMIN_PATH . 'masspm.php');
+    } elseif ($do == 'logview') {
+        include(ADMIN_PATH . 'sitelog.php');
+    } elseif ($do == 'warnedu') {
+        include(ADMIN_PATH . 'warnedusers.php');
+    } elseif ($do == 'prevwarnedu') {
+        include(ADMIN_PATH . 'prev_warnedusers.php');
+    } elseif ($do == 'disabledu') {
+        include(ADMIN_PATH . 'disabledusers.php');
+    } elseif ($do == 'searchdiff') {
+        include(ADMIN_PATH . 'searchdiff.php');
+    } elseif ($do == 'config' && $action == 'read') {
         block_begin(TRACKER_SETTINGS);
 ?>
             <form action='admincp.php?user=<?php
@@ -497,7 +521,120 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             <tr><td class="header">Limit for Most Popular Torrents block:</td><td class="lista"><input type="text" name="mostpoplimit" value="<?php
         echo (int)$GLOBALS["block_mostpoplimit"];
 ?>" size="3" maxlength="3" /></td></tr>
-            <?php
+
+        <!--!Requests Hack -->
+        <?php if ($GLOBALS['requests'] == 'yes') { ?>
+        <tr>
+           <td class='header' align='center' colspan='2'>Requests Settings</td>
+        </tr>
+        <tr>
+           <td class='header'>Delete Filled Requests After (Days):</td>
+           <td class='lista'><input type='text' name='delfillreq' value="<?php echo 0 + $delfillreq; ?>" size='1' maxlength='3' /></td>
+        </tr>
+        <tr>
+           <td class='header'>Requests Section Active:</td>
+           <td class='lista'>Yes&nbsp;<input type='radio' name='requestson' value='true' <?php if ($REQUESTSON == true) echo 'checked' ?> />&nbsp;&nbsp; No&nbsp;<input type='radio' name='requestson' value='false' <?php if ($REQUESTSON == false) echo 'checked' ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Number of Requests per User:</td>
+           <td class='lista'><input type='text' name='maxreqallowed' value="<?php echo (0 + $max_req_allowed);?>" size='40' maxlength='3'/></td>
+        </tr>
+        <?php } ?>
+        <!-- Requests End -->
+
+        <!-- User Warning System Hack Start -->
+        <?php if ($GLOBALS['warn_system'] == 'yes') { ?>
+        <tr>
+           <td class='header' align='center' colspan='2'>User Warning System Settings</td>
+        </tr>
+        <tr>
+           <td class='header'>Accounts get Disabled after:<br><font size='1' color='green'>(# of warns an account get's disabled after)</font></td>
+           <td class='lista'><input type='text' name='warned' value="<?php echo $GLOBALS['warntimes'];?>" /></td>
+        </tr>
+        <tr>
+           <td class='header'>Accounts get Auto Deleted after:<br><font size='1' color='green'>(# of days a disabled account get's deleted after)</font></td>
+           <td class='lista'><input type='text' name='disabled' value="<?php echo $GLOBALS['acctdisable'];?>" /></td>
+        </tr>
+        <tr>
+           <td class='header'>Auto Delete Accounts after Disable:<br><font size='1' color='green'>(is set to <u>No</u> disabled accounts will not be auto deleted)</font></td>
+           <td class='lista'> Yes <input type='radio' name='delete_disabled' value='true' <?php if ($GLOBALS['autodeldisabled']==true) echo 'checked' ?> />&nbsp;&nbsp; No <input type='radio' name='delete_disabled' value='false' <?php if ($GLOBALS['autodeldisabled']==false) echo 'checked' ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Disabled per Page:<br><font size='1' color='green'>(# of disabled accounts listed per page in admincp)</font></td>
+           <td class='lista'><input type='text' name='disableppage' value="<?php echo $GLOBALS['disableppage'];?>" /></td>
+        </tr>
+        <tr>
+           <td class='header'>Warnings per Page:<br><font size='1' color='green'>(# of warns listed per page in admincp)</font></td>
+           <td class='lista'><input type='text' name='warnsppage' value="<?php echo $GLOBALS['warnsppage'];?>" /></td>
+        </tr>
+        <?php } ?>
+        <!-- User Warning System Hack Stop -->
+
+        <!--Enable/Disable Hack's-->
+        <tr>
+           <td class='header' align='center' colspan='2'>Enable/Disable Hack's</td>
+        </tr>
+        <tr>
+           <td class='header'>SeedBonus:</td>
+           <td class='lista'> Yes <input type='radio' name='seed_bonus' value='yes' <?php if ($GLOBALS['seed_bonus'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='seed_bonus' value='no' <?php if ($GLOBALS['seed_bonus'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>FreeLeech:</td>
+           <td class='lista'> Yes <input type='radio' name='freeleech' value='yes' <?php if ($GLOBALS['freeleech'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='freeleech' value='no' <?php if ($GLOBALS['freeleech'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Hit &amp; Run Settings:</td>
+           <td class='lista'> Yes <input type='radio' name='hit_and_run' value='yes' <?php if ($GLOBALS['hit_and_run'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='hit_and_run' value='no' <?php if ($GLOBALS['hit_and_run'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Seeding Time:</td>
+           <td class='lista'> Yes <input type='radio' name='seed_time' value='yes' <?php if ($GLOBALS['seed_time'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='seed_time' value='no' <?php if ($GLOBALS['seed_time'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Requests:</td>
+           <td class='lista'> Yes <input type='radio' name='requests' value='yes' <?php if ($GLOBALS['requests'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='requests' value='no' <?php if ($GLOBALS['requests'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Duplicate IP's</td>
+           <td class='lista'> Yes <input type='radio' name='duplicate_ips' value='yes' <?php if ($GLOBALS['duplicate_ips'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='duplicate_ips' value='no' <?php if ($GLOBALS['duplicate_ips'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Block Link's in Comments:</td>
+           <td class='lista'> Yes <input type='radio' name='block_links' value='yes' <?php if ($GLOBALS['block_links'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='block_links' value='no' <?php if ($GLOBALS['block_links'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Custom Title:</td>
+           <td class='lista'> Yes <input type='radio' name='custom_title' value='yes' <?php if ($GLOBALS['custom_title'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='custom_title' value='no' <?php if ($GLOBALS['custom_title'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Warn/Disable System:</td>
+           <td class='lista'> Yes <input type='radio' name='warn_system' value='yes' <?php if ($GLOBALS['warn_system'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='warn_system' value='no' <?php if ($GLOBALS['warn_system'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Timed Ranks:</td>
+           <td class='lista'> Yes <input type='radio' name='timed_ranks' value='yes' <?php if ($GLOBALS['timed_ranks'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='timed_ranks' value='no' <?php if ($GLOBALS['timed_ranks'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+        <tr>
+           <td class='header'>Torrent Genre:</td>
+           <td class='lista'> Yes <input type='radio' name='torrent_genre' value='yes' <?php if ($GLOBALS['torrent_genre'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='torrent_genre' value='no' <?php if ($GLOBALS['torrent_genre'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+
+        <tr>
+           <td class='header'>Users on Forum:</td>
+           <td class='lista'> Yes <input type='radio' name='users_on_forum' value='yes' <?php if ($GLOBALS['users_on_forum'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='users_on_forum' value='no' <?php if ($GLOBALS['users_on_forum'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+
+        <tr>
+           <td class='header'>Users on Forum Topic:</td>
+           <td class='lista'> Yes <input type='radio' name='users_on_topic' value='yes' <?php if ($GLOBALS['users_on_topic'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='users_on_topic' value='no' <?php if ($GLOBALS['users_on_topic'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+
+        <tr>
+           <td class='header'>Torrent Image:</td>
+           <td class='lista'> Yes <input type='radio' name='image_link' value='yes' <?php if ($GLOBALS['image_link'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='image_link' value='no' <?php if ($GLOBALS['image_link'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+
+    <?php
         print("\n<tr><td align='center' class='header'><input type='submit' name='write' value='" . FRM_CONFIRM . "' /></td><td align='center' class='header'><input type='submit' name='invia' value='" . FRM_CANCEL . "' /></td></tr>");
         print("</table></form>");
         block_end();
@@ -552,7 +689,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             $foutput .= "\$dbuser = '" . $_POST["dbuser"] . "';\n";
             $foutput .= "\$dbpass = '" . $_POST["dbpwd"] . "';\n";
             $foutput .= "\$database = '" . $_POST["dbname"] . "';\n";
-			$foutput.= "\$salting = \"" .$_POST["salting"] . "\";\n";
+	    $foutput .= "\$salting = \"" .$_POST["salting"] . "\";\n";
             $foutput .= "//Tracker's name\n";
             $foutput .= "\$SITENAME='" . $_POST["trackername"] . "';\n";
             $foutput .= "//Tracker's Base URL\n";
@@ -619,12 +756,50 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             $foutput .= "\$GLOBALS['block_forumlimit'] = '" . $_POST["forumlimit"] . "';\n";
             $foutput .= "\$GLOBALS['block_last10limit'] = '" . $_POST["last10limit"] . "';\n";
             $foutput .= "\$GLOBALS['block_mostpoplimit'] = '" . $_POST["mostpoplimit"] . "';\n";
+
+            if ($GLOBALS['requests'] == 'yes') {
+                $foutput .= "//Requests delete days\n";
+                $foutput .= "\$delfillreq=\"" . $_POST["delfillreq"] . "\";\n";
+                $foutput .= "\$REQUESTSON=" . $_POST["requestson"] . ";\n";
+                $foutput .= "\$max_req_allowed =\"" . $_POST["maxreqallowed"] . "\";\n";
+            }
+
+            if ($GLOBALS['warn_system'] == 'yes') {
+                $foutput .= "//user warning system hack\n";
+                $foutput .= "//the number of warnings an account get's disabled at\n";
+                $foutput .= "\$warntimes =\"".$_POST["warned"]."\";\n";
+                $foutput .= "//turn on or off auto deletion of disabled accounts\n";
+                $foutput .= "\$autodeldisabled=".$_POST["delete_disabled"].";\n";
+                $foutput .= "//the number of days a disabled account get's deleted after\n";
+                $foutput .= "\$acctdisable =\"".$_POST["disabled"]."\";\n";
+                $foutput .= "//number of disabled accounts per page listed in admincp\n";
+                $foutput .= "\$disableppage =\"".$_POST["disableppage"]."\";\n";
+                $foutput .= "//number of warns per page listed in admincp\n";
+                $foutput .= "\$warnsppage =\"".$_POST["warnsppage"]."\";\n";
+            }
+
+            #Hacks...
             $foutput .= "\$GLOBALS['clocktype'] = " . $_POST["clocktype"] . ";\n";
+            $foutput .= "\$GLOBALS['seed_bonus'] = '" . $_POST["seed_bonus"] . "';\n";
+            $foutput .= "\$GLOBALS['freeleech'] = '" . $_POST["freeleech"] . "';\n";
+            $foutput .= "\$GLOBALS['hit_and_run'] = '" . $_POST["hit_and_run"] . "';\n";
+            $foutput .= "\$GLOBALS['seed_time'] = '" . $_POST["seed_time"] . "';\n";
+            $foutput .= "\$GLOBALS['requests'] = '" . $_POST["requests"] . "';\n";
+            $foutput .= "\$GLOBALS['duplicate_ips'] = '" . $_POST["duplicate_ips"] . "';\n";
+            $foutput .= "\$GLOBALS['block_links'] = '" . $_POST["block_links"] . "';\n";
+            $foutput .= "\$GLOBALS['warn_system'] = '" . $_POST["warn_system"] . "';\n";
+            $foutput .= "\$GLOBALS['custom_title'] = '" . $_POST["custom_title"] . "';\n";
+            $foutput .= "\$GLOBALS['timed_ranks'] = '" . $_POST["timed_ranks"] . "';\n";
+            $foutput .= "\$GLOBALS['torrent_genre'] = '" . $_POST["torrent_genre"] . "';\n";
+            $foutput .= "\$GLOBALS['users_on_forum'] = '" . $_POST["users_on_forum"] . "';\n";
+            $foutput .= "\$GLOBALS['users_on_topic'] = '" . $_POST["users_on_topic"] . "';\n";
+            $foutput .= "\$GLOBALS['image_link'] = '" . $_POST["image_link"] . "';\n";
             $foutput .= "\n?>";
             fwrite($fd, $foutput) or die(CANT_SAVE_CONFIG);
             fclose($fd);
             @chmod("include/config.php", 0744);
             $db->query("UPDATE users SET language = " . $db->real_escape_string($_POST['default_langue']) . ", style = " . $db->real_escape_string($_POST['default_style']) . " WHERE id_level = 1");
+            MCached::del('user::style::' . $_POST['default_style']);
             print(CONFIG_SAVED);
             redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"]);
             exit;
@@ -1191,6 +1366,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
 
             $id = intval($_GET["id"]);
             $db->query("INSERT INTO users_level SET " . $strupdate);
+            MCached::del('rank::list');
         }
         redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=level&action=read");
     } elseif ($do == "level" && $action == "delete") {
@@ -1208,6 +1384,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         
         if ($rcancanc["can_be_deleted"] == "yes") {
             $db->query("DELETE FROM users_level WHERE id = " . $id);
+            MCached::del('rank::list');
             redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=level&action=read");
         } else
             err_msg(ERROR, CANT_DELETE_GROUP);
@@ -1236,6 +1413,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             $strupdate = implode(",", $update);
             $id = intval($_GET["id"]);
             $db->query("UPDATE users_level SET " . $strupdate . " WHERE id = " . $id);
+            MCached::del('rank::list');
         }
         redirect("admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=level&action=read");
     } elseif ($do == "language" && $action == "read") {
@@ -1844,11 +2022,12 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
                 $db->query("INSERT INTO style SET style = '" . $db->real_escape_string($_POST["style"]) . "', style_url = '" . $_POST["style_url"] . "'");
                 MCached::del('style::list');
                 
-				print(STYLE_ADDED);
+		print(STYLE_ADDED);
             } else {
                 $id = intval($_GET["id"]);
                 $db->query("UPDATE style SET style = '" . $db->real_escape_string($_POST["style"]) . "', style_url='" . $_POST["style_url"] . "' WHERE id = " . $id);
                 MCached::del('style::list');
+                MCached::del('user::style::' . $id);
                 
 		print(STYLE_MODIFIED);
             }

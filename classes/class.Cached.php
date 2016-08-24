@@ -47,8 +47,8 @@ class Cached {
            global $db;
 
            MCached::connect();
-	   $key = 'genre::list';
-	   $ret = MCached::get($key);
+	       $key = 'genre::list';
+	       $ret = MCached::get($key);
            if ($ret === MCached::NO_RESULT) {
                $ret = array();
                $res = $db->query("SELECT * FROM categories ORDER BY sort_index, id");
@@ -56,6 +56,23 @@ class Cached {
                while ($row = $res->fetch_array(MYSQLI_BOTH))
                    $ret[] = $row;
                MCached::add($key, $ret, self::ONE_DAY);
+           }
+           return $ret;
+        }
+
+        public static function rank_list() {
+           global $db;
+
+           MCached::connect();
+	       $key = 'rank::list';
+	       $ret = MCached::get($key);
+           if ($ret === MCached::NO_RESULT) {
+               $ret = array();
+               $res = $db->query("SELECT * FROM users_level ORDER BY id_level");
+
+               while ($row = $res->fetch_array(MYSQLI_BOTH))
+                   $ret[] = $row;
+               MCached::add($key, $ret, self::SIX_HOURS);
            }
            return $ret;
         }

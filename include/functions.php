@@ -27,10 +27,10 @@ if (ini_get('register_globals')) {
     @ini_set('register_globals', false);
 }
 
-$tracker_version = "1.5.1";
+$tracker_version = '1.5.1';
 
 // CHECK FOR INSTALLATION FOLDER WITHOUT INSTALL.ME
-if (file_exists("install") && !file_exists("install.me")) {
+if (file_exists('install') && !file_exists('install.me')) {
     $err_msg_install = ("<div align='center' style='color:red; font-size:12pt; font-weight: bold;'>SECURITY WARNING: Delete install folder!</div>");
 }
 
@@ -52,13 +52,20 @@ require_once(CLASS_PATH . 'class.Vars.php');
 require_once(CLASS_PATH . 'class.User.php');
 require_once(CLASS_PATH . 'class.Memcached.php');
 require_once(CLASS_PATH . 'class.Cached.php');
+require_once(CLASS_PATH . 'Smarty.class.php');
+
+$smarty = new Smarty;
+
+$smarty->debugging = false;
+$smarty->caching = false;
+$smarty->cache_lifetime = 120;
 
 #Connect to Memcached...
 MCached::connect();
 
-raintpl::configure("base_url", null);
-raintpl::configure("tpl_dir", "");
-raintpl::configure("cache_dir", "cache/");
+raintpl::configure('base_url', null);
+raintpl::configure('tpl_dir', '');
+raintpl::configure('cache_dir', 'cache/');
 
 $tpl = new RainTPL;
 
@@ -88,16 +95,7 @@ function get_microtime() {
 }
 
 function print_version() {
-    global $time_start, $gzip, $PRINT_DEBUG, $tracker_version;
-	
-    $time_end = get_microtime();
-    $max_mem = memory_get_peak_usage();
-	
-    print("<p align='center'>");
-    if ($PRINT_DEBUG) {
-        print("<small>[ Execution Time: " . number_format(($time_end - $time_start), 4) . " sec. ] - [Memcached Queries: " . MCached::$count . " (" . round(MCached::$time, 4) . " sec.)] - [Memory Usage: " . misc::makesize($max_mem) . "]</small><br />");
-    }
-    print("BtiTracker (" . $tracker_version . ") by <a href='https://github.com/Yupy/BtiTracker-1.5.1' target='_blank'>Yupy</a> & <a href='http://www.btiteam.org' target='_blank'>Btiteam</a></p>");
+    return misc::version();
 }
 
 //Disallow special characters in username
@@ -520,6 +518,42 @@ function categories($val = '') {
     echo "</select>";
 }
 
+function categories2($val = '') {
+    global $db;
+	
+    $return = "<select name='category'><option value='0'>----</option>";
+    $c_q = @$db->query("SELECT * FROM categories WHERE sub = '0' ORDER BY id ASC");
+    while ($c = $c_q->fetch_array(MYSQLI_BOTH)) {
+        $cid  = (int)$c["id"];
+        $name = security::html_safe(unesc($c["name"]));
+		
+        // lets see if it has sub-categories.
+        $s_q  = $db->query("SELECT * FROM categories WHERE sub = '" . $cid . "'");
+        $s_t  = $s_q->num_rows;
+		
+        if ($s_t == 0) {
+            $checked = "";
+            if ($cid == $val) {
+                $checked = "selected";
+            }
+            $return .= "<option " . $checked . " value='" . $cid . "'>" . $name . "</option>";
+        } else {
+            $return .= "<optgroup label='" . $name . "'>";
+            while ($s = $s_q->fetch_array(MYSQLI_BOTH)) {
+                $sub     = (int)$s["id"];
+                $name    = security::html_safe($s["name"]);
+                $checked = "";
+                if ($sub == $val) {
+                    $checked = "selected";
+                }
+                $return .= "<option " . $checked . " value='" . $sub . "'>" . $name . "</option>";
+            }
+            $return .= '</optgroup>';
+        }
+    }
+    return $return . '</select>';
+}
+
 // this returns all the subcategories
 function sub_categories($val = '') {
     global $db;
@@ -744,8 +778,14 @@ function print_users() {
         print("<td class='header' align='center'>" . DELETE . "</td>");
     else
         print("</tr>");
+
+    if ($GLOBALS['warn_system'] == 'yes') {
+        $udisabled = 'users.disabled, ';
+    } else {
+        $udisabled = '';
+    }
 	
-    $query  = "SELECT prefixcolor, suffixcolor, users.id, downloaded, uploaded, IF(downloaded > 0, uploaded / downloaded, 0) AS ratio, username, level, UNIX_TIMESTAMP(joined) AS joined, UNIX_TIMESTAMP(lastconnect) AS lastconnect, flag, flagpic, name 
+    $query  = "SELECT prefixcolor, suffixcolor, " . $udisabled . " users.id, downloaded, uploaded, IF(downloaded > 0, uploaded / downloaded, 0) AS ratio, username, level, UNIX_TIMESTAMP(joined) AS joined, UNIX_TIMESTAMP(lastconnect) AS lastconnect, flag, flagpic, name 
 	    FROM users INNER JOIN users_level ON users.id_level = users_level.id LEFT JOIN countries ON users.flag = countries.id 
 		WHERE users.id > 1 " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
     $rusers = $db->query($query);
@@ -755,8 +795,14 @@ function print_users() {
     else {
         include(INCL_PATH . 'offset.php');
         while ($row_user = $rusers->fetch_array(MYSQLI_BOTH)) {
+            if ($GLOBALS['warn_system'] == 'yes') {
+                $warn_icon = Warn_disabled((int)$row_user['id']);
+            } else {
+                $warn_icon = '';
+            }
+
             print("<tr>\n");
-            print("<td class='lista'><a href='userdetails.php?id=" . (int)$row_user["id"] . "'>" . unesc($row_user["prefixcolor"]) . security::html_safe(unesc($row_user["username"])) . unesc($row_user["suffixcolor"]) . "</a></td>");
+            print("<td class='lista'><a href='userdetails.php?id=" . (int)$row_user["id"] . "'>" . unesc($row_user["prefixcolor"]) . security::html_safe(unesc($row_user["username"])) . unesc($row_user["suffixcolor"]) . "</a>" . $warn_icon . "</td>");
             print("<td class='lista' align='center'>" . security::html_safe($row_user["level"]) . "</td>");
             print("<td class='lista' align='center'>" . ($row_user["joined"] == 0 ? NOT_AVAILABLE : date("d/m/Y H:i:s", $row_user["joined"] - $offset)) . "</td>");
             print("<td class='lista' align='center'>" . ($row_user["lastconnect"] == 0 ? NOT_AVAILABLE : date("d/m/Y H:i:s", $row_user["lastconnect"] - $offset)) . "</td>");
@@ -852,6 +898,49 @@ function write_log($text, $reason = 'add') {
     }
 }
 
-// EOF
+//User Warning System Hack Start
+function Warn_disabled($iduser) {
+    global $db;
+
+    $warn_stats = $db->query("SELECT * FROM warnings WHERE userid = " . $iduser . " AND active='yes'");
+
+    if (!$warn_stats) {
+    } else {
+	$warn_stat = $warn_stats->num_rows;
+	$warn_statss = $warn_stats->fetch_array(MYSQLI_BOTH);
+
+	if ($warn_stat == 0)
+	    $warned = '';
+	else {
+	    if (user::$current['edit_users'] == 'yes')
+	        $warn = 'Warned: ' . security::html_safe($warn_statss['reason']);
+	    else
+	        $warn = 'This user has been warned !';
+
+	    $warned = "<img src='images/warned.png' border='0' title='" . $warn . "' />";
+	  }
+    }
+
+    $disable_stats = $db->query("SELECT disabled, disabledreason FROM users WHERE id = " . $iduser);
+
+    if (!$disable_stats) {
+    } else {
+        $disable_stat = $disable_stats->fetch_array(MYSQLI_BOTH);
+
+	if ($disable_stat['disabled'] == 'no')
+	    $disabled = '';
+	else {
+	    if (user::$current['edit_users'] == 'yes')
+	        $disable = 'Disabled: ' . security::html_safe($disable_stat['disabledreason']);
+	    else
+	        $disable = 'This account has been disabled !';
+
+	    $disabled = "&nbsp;<img src='images/disabled.png' border='0' title='" . $disable . "' />";
+        }
+    }
+	return $warned . "" . $disabled;
+}
+//User Warning System Hack Stop
+
 
 ?>

@@ -15,38 +15,38 @@ class user {
 
         public static $current = NULL;
 
-	public static function prepare_user(&$user, $curuser = false) {
-		if ($curuser && empty($user))
-			die;
+	    public static function prepare_user(&$user, $curuser = false) {
+		   if ($curuser && empty($user))
+		       die;
 
-		if (isset($user['torrentsperpage']))
-		    $user['torrentsperpage'] = (int)$user['torrentsperpage'];
-		if (isset($user['uid']))
-		    $user['uid'] = (int)$user['uid'];
-		if (isset($user['username']))
-		    $user['username'] = security::html_safe($user['username']);
-		if (isset($user['language']))
-		    $user['language'] = (int)$user['language'];
-		if (isset($user['style']))
-		    $user['style'] = (int)$user['style'];
-		if (isset($user['flag']))
-		    $user['flag'] = (int)$user['flag'];
-		if (isset($user['topicsperpage']))
-		    $user['topicsperpage'] = (int)$user['topicsperpage'];
-		if (isset($user['postsperpage']))
-		    $user['postsperpage'] = (int)$user['postsperpage'];
-		if (isset($user['id_level']))
-		    $user['id_level'] = (int)$user['id_level'];
-		if (isset($user['WT']))
-		    $user['WT'] = (int)$user['WT'];
-		if (isset($user['random']))
-		    $user['random'] = (int)$user['random'];
-		if (isset($user['flags']))
-		    $user['flags'] = (int)$user['flags'];
-	}
+		   if (isset($user['torrentsperpage']))
+		       $user['torrentsperpage'] = (int)$user['torrentsperpage'];
+		   if (isset($user['uid']))
+		       $user['uid'] = (int)$user['uid'];
+		   if (isset($user['username']))
+		       $user['username'] = security::html_safe($user['username']);
+		   if (isset($user['language']))
+		       $user['language'] = (int)$user['language'];
+		   if (isset($user['style']))
+		       $user['style'] = (int)$user['style'];
+		   if (isset($user['flag']))
+		       $user['flag'] = (int)$user['flag'];
+		   if (isset($user['topicsperpage']))
+		       $user['topicsperpage'] = (int)$user['topicsperpage'];
+		   if (isset($user['postsperpage']))
+		       $user['postsperpage'] = (int)$user['postsperpage'];
+		   if (isset($user['id_level']))
+		       $user['id_level'] = (int)$user['id_level'];
+		   if (isset($user['WT']))
+		       $user['WT'] = (int)$user['WT'];
+		   if (isset($user['random']))
+		       $user['random'] = (int)$user['random'];
+		   if (isset($user['flags']))
+		       $user['flags'] = (int)$user['flags'];
+	    }
 
         public static function login() {
-		global $db, $tpl;
+		        global $db, $tpl;
                 unset($GLOBALS['CURUSER']);
                 require_once(CLASS_PATH . 'class.Cached.php');
     
@@ -56,7 +56,7 @@ class user {
     
                 #Check if User is Banned...
                 #if (!($row['flags'] & BIT_26)) -- TO-DO
-	        #$banned = false;
+	                 #$banned = false;
 
                 if (Cached::bans($ip, $reason))
                     $banned = true;
@@ -71,9 +71,9 @@ class user {
                     header('Content-Type: text/html; charset=utf-8');
 
                     $banned_message = security::html_safe($reason);
-	            $tpl->assign('banned_message', $banned_message);
+	                $tpl->assign('banned_message', $banned_message);
 
-	            $banned_msg = $tpl->draw('style/base/tpl/banned_message', $return_string = true);
+	                $banned_msg = $tpl->draw('style/base/tpl/banned_message', $return_string = true);
                     echo $banned_msg;
 
                     die;
@@ -92,13 +92,13 @@ class user {
                 if (!$id)
                     $id = 1;
 
-		$key = 'current::user::' . $id;
-		$row = MCached::get($key);
-		if ($row === MCached::NO_RESULT) {
+		        $key = 'current::user::' . $id;
+		        $row = MCached::get($key);
+		        if ($row === MCached::NO_RESULT) {
                     $res = $db->query("SELECT " . self::USER_FIELDS1 . " FROM users INNER JOIN users_level ON users.id_level = users_level.id WHERE users.id = " . $id);
                     $row = $res->fetch_array(MYSQLI_BOTH);
-		    MCached::add($key, $row, self::EXPIRE_CURUSER);
-		}
+		            MCached::add($key, $row, self::EXPIRE_CURUSER);
+		        }
     
                 self::prepare_user($row);
     
@@ -122,7 +122,7 @@ class user {
                     'Moderator' => 6,
                     'Administrator' => 7,
                     'Owner' => 8
-                ); // Staff ID level's 
+                ); # Staff ID level's 
 
                 $ip = ($row['id_level'] <> $hide_ips['Moderator']) ? $ip : '127.0.0.1';
                 $ip = ($row['id_level'] <> $hide_ips['Administrator']) ? $ip : '127.0.0.1';

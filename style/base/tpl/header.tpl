@@ -1,67 +1,66 @@
 {if="$is_registered"}
-<table width='100%' height='100%'  border='0'>
-<tr>
-    <td>
-       <div class='row'>
-       <div id='navContainer'>
-       <div id='navRepeatPar'>
-       <div id='bgRepeat'>
-          <img src='style/base/images/menu_back.png' height='100%' width='100%'>
-       </div>
-       <div class="logo text-center" id="logo">
-          <img src='style/base/images/tracker_logo.png'>
-          <span>{$lang_welcome_back} <b>{$cur_username}</b></span>
-       </div>
 
-       <!--The Menu-->
-       <div id='mainNavigation'>
-          <ul id="menu-main-navigation">
-             <li><a href='./'>{$lang_index}</a></li>
-             {if="$view_torrents"}
-                 <li><a href='torrents.php'>{$lang_torrents}</a></li>
-                 <li><a href='extra-stats.php'>{$lang_stats}</a></li>
-             {/if}
+<div class='logo'>
+    <img src='style/base/images/logo.png' alt='Logo' class='logo-image'>
+    <div class='stats'>
+    {$lang_welcome_back} <b>{$cur_username}</b> -- <a href='logout.php?check_hash={$logout_salt}'><font color='#413F36'>Logout</font></a>{if="$seedbonus_enabled"}&nbsp; &nbsp;<a href='seedbonus.php'><font color='#ADD8E6'>Bonus:</font></a> {$user_bonus}{/if} {if="$hitandrun_enabled"}&nbsp;&nbsp;<font color='#ADD8E6'>Hit&amp;Run's:</font> {$hit_and_runs}{/if}
+    <br />
+    <font color='yellow'>Ratio:</font> {$user_ratio}&nbsp; &nbsp;<font color='lime'>U:</font> {$user_uploaded}&nbsp; &nbsp;<font color='orange'>D:</font> {$user_downloaded}
+    
+    {if="$admincp_access"}
+       &nbsp; -- &nbsp;<a href='admincp.php?user={$cur_id}&amp;code={$random}'><font color='#614051'>AdminCP</font></a>
+    {/if}
 
-             {if="$can_upload"}
-                 <li><a href='upload.php'>{$lang_upload}</a></li>
-             {/if}
+    &nbsp; -- &nbsp;<a href='usercp.php?uid={$cur_id}'><font color='#614051'>Profile</font></a>
+    &nbsp; -- &nbsp;{$user_pm}
+</div>
+</div>
 
-             {if="$view_users"}
-                 <li><a href='users.php'>{$lang_members}</a></li>
-             {/if}
+<div id='pages'>
+    <div id='pages-inside'>
+	<ul class='nav superfish'>
+	<li class='current_page_item'><a href='index.php'>{$lang_index}</a></li>
+        {if="$view_torrents"}		
+	   <li class='page_item'><a href='torrents.php'>{$lang_torrents}</a></li>
+           <li class='page_item'><a href='extra-stats.php'>{$lang_stats}</a></li>
+        {/if}
 
-             {if="$view_forum"}
-                 <li><a href='forum.php'>{$lang_forum}</a></li>
-             {/if}
-             
-             <!--User Stats-->
-             <br style='line-height: 4px;'>
-             <span style='font-size: 11px; position: absolute; margin-left: 35%;'><img src='images/quote.png' title='Ratio'></span>
-             <span style='font-size: 11px; position: absolute; margin-left: 41%; margin-top: 8px; color: yellow;'>{$user_ratio}</span>
-             <span style='font-size: 11px; margin-left: -40px;'><font color='lime'>Upped:</font> {$user_uploaded}</span>
-             <br />
-             <span style='font-size: 11px; margin-left: -40px;'><font color='red'>Downed:</font> {$user_downloaded}</span>
-             <br />
-             <br />
-             {if="$admincp_access"}
-                 <span style='font-size: 11px; margin-left: -40px;'><a href='admincp.php?user={$cur_id}&amp;code={$random}'><img src='images/admincp.png' title='Admin Panel'></a></span>
-             {/if}
-             <span style='font-size: 11px; margin-left: 7px;'><a href='usercp.php?uid={$cur_id}'><img src='images/usercp.png' hight='24' width='24' title='Edit Profile'></a></span>
-<span style='font-size: 11px; margin-left: 7px;'>{$user_pm}</span>
-             <!--End User Stats-->
-          </ul>
-       </div>
-       <!--Menu End-->
+        {if="$can_upload"}
+           <li class='page_item'><a href='upload.php'>{$lang_upload}</a></li>
+        {/if}
 
-       </div>
-       <div id='navArrowImg'>
-          <span style='position:absolute;'><a href='logout.php?check_hash={$logout_salt}'><img style='margin-top:50px; margin-left: 103px;' src='images/logout.png' title='Logout' alt='Logout'></a></span>
-          <img src='style/base/images/menu_down.png' height='130' width='100%'>
-       </div>
-    </td>
-</tr>
+        {if="$requests_enabled"}
+           <li class='page_item'><a href='viewrequests.php'>Requests</a></li>
+        {/if}
+
+        {if="$view_users"}
+           <li class='page_item'><a href='users.php'>{$lang_members}</a></li>
+        {/if}
+
+        {if="$view_forum"}
+           <li class='page_item'><a href='forum.php'>{$lang_forum}</a></li>
+        {/if}
+
+</ul>
+</div>
+
+<!--Donation-->
+<span style='float: right; margin-right: 20px; margin-top: -8px;'>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+   <input type="hidden" name="cmd" value="_s-xclick">
+   <input type="hidden" name="hosted_button_id" value="Z2CDWYNVAJ2VE">
+   <input type="image" src="images/donate.png" title='Donate' width='36' border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+</form>
+
+</span>
+</div>
+<div style='clear: both;'></div>
+
+<div id='bodywrap'></div>
 
 <table width='100%' height='100%' border='0'>
 <tr>
-    <td valign='top'><div style='min-height: 370px;' class='columns container back right'>
+    <td valign='top'>
+<div id='wrapper2'>
+
 {/if}

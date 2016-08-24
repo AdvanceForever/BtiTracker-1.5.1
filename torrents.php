@@ -144,10 +144,16 @@ if ($count) {
 
     list($pagertop, $limit) = misc::pager($torrentperpage, $count,  $scriptname."?" . $addparam.(utf8::strlen($addparam) > 0 ? "&amp;" : "")."order=" . $order . "&amp;by=" . $by . "&amp;");
 
+    if ($GLOBALS['torrent_genre'] == 'yes') {
+        $genre = 'namemap.genre,';
+    } else {
+        $genre = '';
+    }
+
     if ($SHOW_UPLOADER)
-        $query = "SELECT summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, namemap.anonymous, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader AS upname, users.username AS uploader, prefixcolor, suffixcolor FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN users ON users.id = namemap.uploader LEFT JOIN users_level ON users.id_level=users_level.id " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
+        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, namemap.anonymous, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader AS upname, users.username AS uploader, prefixcolor, suffixcolor FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN users ON users.id = namemap.uploader LEFT JOIN users_level ON users.id_level=users_level.id " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
     else
-        $query = "SELECT summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
+        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
 
    $results = $db->query($query) or err_msg(ERROR, CANT_DO_QUERY . "<br />" . $query);
 }
@@ -169,26 +175,26 @@ else
 <table width='100%' class='lista'>
 <!-- Column Headers  -->
 <tr>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=cname&amp;by=" . ($order == "cname" && $by == "ASC" ? "DESC" : "ASC") . "'>" . CATEGORY . "</a>" . ($order == "cname" ? $mark : ""); ?></td>
+<td align='center' class='header' width='24'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=cname&amp;by=" . ($order == "cname" && $by == "ASC" ? "DESC" : "ASC") . "'>" . CATEGORY . "</a>" . ($order == "cname" ? $mark : ""); ?></td>
 <td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=filename&amp;by=" . ($order == "filename" && $by == "ASC" ? "DESC" : "ASC") . "'>" . FILE . "</a>" . ($order == "filename" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo COMMENT; ?></td>
+<td align='center' class='header' width='34'><?php echo COMMENT; ?></td>
 <!--<td align='center' class='header'><?php echo RATING; ?></td>-->
 <?php
 if (user::$current["WT"] > 0)
     print("<td align='center' class='header'>" . WT . "</td>");
 ?>
-<td align='center' class='header'><?php echo DOWN; ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=data&amp;by=" . ($order == "data" && $by == "ASC" ? "DESC" : "ASC") . "'>" . ADDED . "</a>" . ($order == "data" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=size&amp;by=" . ($order == "size" && $by == "DESC" ? "ASC" : "DESC") . "'>" . SIZE . "</a>" . ($order == "size" ? $mark : ""); ?></td>
+<td align='center' class='header' width='20'><?php echo DOWN; ?></td>
+<td align='center' class='header' width='42'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=data&amp;by=" . ($order == "data" && $by == "ASC" ? "DESC" : "ASC") . "'>" . ADDED . "</a>" . ($order == "data" ? $mark : ""); ?></td>
+<td align='center' class='header' width='70'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=size&amp;by=" . ($order == "size" && $by == "DESC" ? "ASC" : "DESC") . "'>" . SIZE . "</a>" . ($order == "size" ? $mark : ""); ?></td>
 <?php
 if ($SHOW_UPLOADER)
-    print("<td align='center' class='header'>" . UPLOADER . "</td>");
+    print("<td align='center' class='header' width='80'>" . UPLOADER . "</td>");
 ?>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=seeds&amp;by=" . ($order == "seeds" && $by == "DESC" ? "ASC" : "DESC")."'>" . SHORT_S . "</a>" . ($order == "seeds" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=leechers&amp;by=" . ($order == "leechers" && $by == "DESC" ? "ASC" : "DESC")."'>" . SHORT_L . "</a>" . ($order == "leechers" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=finished&amp;by=" . ($order == "finished" && $by == "ASC" ? "DESC" : "ASC")."'>" . SHORT_C . "</a>" . ($order == "finished" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=dwned&amp;by=" . ($order == "dwned" && $by == "ASC" ? "DESC" : "ASC")."'>" . DOWNLOADED . "</a>" . ($order == "dwned" ? $mark : ""); ?></td>
-<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=speed&amp;by=" . ($order == "speed" && $by == "ASC" ? "DESC" : "ASC")."'>" . SPEED . "</a>" . ($order == "speed" ? $mark : ""); ?></td>
+<td align='center' class='header' width='40'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=seeds&amp;by=" . ($order == "seeds" && $by == "DESC" ? "ASC" : "DESC")."'>" . SHORT_S . "</a>" . ($order == "seeds" ? $mark : ""); ?></td>
+<td align='center' class='header' width='40'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=leechers&amp;by=" . ($order == "leechers" && $by == "DESC" ? "ASC" : "DESC")."'>" . SHORT_L . "</a>" . ($order == "leechers" ? $mark : ""); ?></td>
+<td align='center' class='header' width='40'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=finished&amp;by=" . ($order == "finished" && $by == "ASC" ? "DESC" : "ASC")."'>" . SHORT_C . "</a>" . ($order == "finished" ? $mark : ""); ?></td>
+<!--<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=dwned&amp;by=" . ($order == "dwned" && $by == "ASC" ? "DESC" : "ASC")."'>" . DOWNLOADED . "</a>" . ($order == "dwned" ? $mark : ""); ?></td>
+<td align='center' class='header'><?php echo "<a href='" . $scriptname . "?" . $addparam . "" . (utf8::strlen($addparam) > 0 ? "&amp;" : "") . "order=speed&amp;by=" . ($order == "speed" && $by == "ASC" ? "DESC" : "ASC")."'>" . SPEED . "</a>" . ($order == "speed" ? $mark : ""); ?></td>-->
 <!--<td align='center' class='header'><?php echo AVERAGE; ?></td>-->
 </tr>
 <tr>
@@ -211,6 +217,12 @@ if ($count) {
         $writeout = $values[$i % 2];
 
     while ($data = $results->fetch_array(MYSQLI_BOTH)) {
+         if ($data['free'] == 'yes') {
+	     $golden = "<font color='lime' size='1'>Freeleech</font> ";	
+	 } else {
+             $golden = '';
+         }
+
         $commentdata = MCached::get('torrent::comments::count::' . $data['hash']);
         if ($commentdata === MCached::NO_RESULT) {
             $commentres = $db->query("SELECT COUNT(*) AS comments FROM comments WHERE info_hash = '" . $db->real_escape_string($data['hash']) . "'");
@@ -218,9 +230,15 @@ if ($count) {
             MCached::add('torrent::comments::count::' . $data['hash'], $commentdata, 14400);
         }
 
+        if ($GLOBALS['torrent_genre'] == 'yes') {
+            $display_genre = "<br /><span style='color: #999999 ' >" . security::html_safe($data['genre']) . "</span>";
+        } else {
+            $display_genre = '';
+        }
+
         echo "<tr>\n";
         echo "\t<td align='center' class='lista'><a href='torrents.php?category=" . (int)$data['catid'] . "'>" . image_or_link(($data["image"] == "" ? "" : "images/categories/" . $data["image"]), "", security::html_safe($data["cname"])) . "</td>";
-        echo "\t<td align='left' class='lista'><a href='details.php?id=" . $data["hash"] . "' title='" . VIEW_DETAILS . ": " . security::html_safe($data["filename"]) . "'>" . security::html_safe($data["filename"]) . "</a>" . ($data["external"] == "no" ? "" : " (<span style='color:red'>EXT</span>)") . "</td>";
+        echo "\t<td align='left' class='lista'><a href='details.php?id=" . $data["hash"] . "' title='" . VIEW_DETAILS . ": " . security::html_safe($data["filename"]) . "'>" . security::html_safe($data["filename"]) . "</a>" . ($data["external"] == "no" ? "" : " (<span style='color:red'>EXT</span>)") . " " . $golden . "" . $display_genre . "</td>";
 
     if ($commentdata) {
         if ($commentdata["comments"] > 0) {
@@ -316,7 +334,7 @@ if ($count) {
         echo "\t<td align='center' class='" . linkcolor($data["seeds"]) . "'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["seeds"] . "</a></td>\n";
         echo "\t<td align='center' class='" . linkcolor($data["leechers"]) . "'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["leechers"] . "</a></td>\n";
 
-		if ($data["finished"] > 0)
+	if ($data["finished"] > 0)
             echo "\t<td align='center' class='lista'><a href='torrent_history.php?id=" . $data["hash"] . "' title='History - " . security::html_safe($data["filename"]) . "'>" . number_format((int)$data["finished"], 0) . "</a></td>";
         else
             echo "\t<td align='center' class='lista'>---</td>";
@@ -330,7 +348,7 @@ if ($count) {
         else
             echo "\t<td align='center' class='lista'>---</td>";
     }
-
+/*
     if ($data["dwned"] > 0)
         echo "\t<td align='center' class='lista'>" . misc::makesize((int)$data["dwned"]) . "</td>";
     else
@@ -350,7 +368,7 @@ if ($count) {
 
         echo "\t<td align='center' class='lista'>" . $speed . "</TD>\n";
     }
-
+*/
     // progress
     /*
     if ($data["external"] == "yes")

@@ -30,7 +30,7 @@ function usertable($res, $frame_caption)
             echo "<tr>" . "<table width='100%' class='lista'>" . "<td class='header' align='center'>" . USER_LEVEL . "</td>" . "<td class='header' align='center'>" . USER_NAME . "</td>" . "<td class='header' align='center'>" . UPLOADED . "</td>" . "<td class='header' align='center'>" . DOWNLOADED . "</td>" . "<td class='header' align='center'>" . RATIO . "</td>" . "</tr>";
             $menu = 1;
         }
-        $topuser = ($a["id"] > 1 ? "<a href='userdetails.php?id=" . (int)$a["id"] . "'><b>" . security::html_safe($a["username"]) . "</b></a>" : "<b>" . security::html_safe($a["username"]) . "</b>");
+        $topuser = ($a["id"] > 1 ? "<a href='userdetails.php?id=" . (int)$a["id"] . "'><b>" . security::html_safe($a["username"]) . "</b></a>" . Warn_disabled($a['id']) . "" : "<b>" . security::html_safe($a["username"]) . "</b>");
         print("<tr><td class='lista' align='center' width='20%' >" . $num . "</td><td class='lista' align='center'>" . $topuser . "</td><td class='lista' align='center' width='20%'>" . misc::makesize((int)$a["uploaded"]) . "</td><td class='lista' align='center' width='20%'>" . misc::makesize((int)$a["downloaded"]) . "</td><td class='lista' align='center' width='20%'>$ratio</td></tr>");
     }
     end_table();
@@ -85,49 +85,49 @@ if (user::$current["view_users"] == "yes") {
     $r = $db->query("SELECT * FROM users WHERE uploaded > 0 ORDER BY uploaded DESC LIMIT 10") or die;
     if ($r->num_rows > 0) {
         usertable($r, TOP_10_UPLOAD);
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT * FROM users WHERE uploaded > 0 AND downloaded > 0 ORDER BY downloaded DESC LIMIT 10") or die;
     if ($r->num_rows > 0) {
         usertable($r, TOP_10_DOWNLOAD);
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT * FROM users WHERE downloaded > 104857600 ORDER BY uploaded - downloaded DESC LIMIT 10") or die;
     if ($r->num_rows > 0) {
         usertable($r, TOP_10_SHARE . " <font class='lista'>" . MINIMUM_100_DOWN . "</font>");
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT * FROM users WHERE downloaded > 104857600 ORDER BY downloaded - uploaded DESC, downloaded DESC LIMIT 10") or die;
     if ($r->num_rows > 0) {
         usertable($r, TOP_10_WORST . " <font class='lista'>" . MINIMUM_100_DOWN . "</font>");
-        echo "<br /><br />";
+        echo "<br />";
     }
 }
 if (user::$current["view_torrents"] == "yes") {
     $r = $db->query("SELECT summary.info_hash AS hash, summary.seeds AS seeds, summary.leechers AS leechers, summary.finished, summary.dlbytes AS dwned, namemap.filename AS name, namemap.url AS url, namemap.info, summary.speed AS speed, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash ORDER BY seeds + leechers DESC LIMIT 10") or sqlerr();
     if ($r->num_rows > 0) {
         _torrenttable($r, TOP_10_ACTIVE . " </font>");
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT summary.info_hash AS hash, summary.seeds AS seeds, summary.leechers AS leechers, summary.finished, summary.dlbytes AS dwned, namemap.filename AS name, namemap.url AS url, namemap.info, summary.speed AS speed, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash WHERE seeds >= 5 ORDER BY seeds / leechers DESC, seeds DESC LIMIT 10") or sqlerr();
     if ($r->num_rows > 0) {
         _torrenttable($r, TOP_10_BEST_SEED . "<font class='small'>(" . MINIMUM_5_SEED . ")</font>");
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT summary.info_hash AS hash, summary.seeds AS seeds, summary.leechers AS leechers, summary.finished, summary.dlbytes AS dwned, namemap.filename AS name, namemap.url AS url, namemap.info, summary.speed AS speed, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash WHERE leechers >= 5 AND finished > 0 ORDER BY seeds / leechers ASC, leechers DESC LIMIT 10") or sqlerr();
     if ($r->num_rows > 0) {
         _torrenttable($r, TOP_10_WORST_SEED . " <font class='small'>(" . MINIMUM_5_LEECH . ")</font>");
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT summary.info_hash AS hash, summary.seeds AS seeds, summary.leechers AS leechers, summary.finished, summary.dlbytes AS dwned, namemap.filename AS name, namemap.url AS url, namemap.info, summary.speed AS speed, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash WHERE external = 'no' ORDER BY speed DESC, seeds DESC LIMIT 10") or sqlerr();
     if ($r->num_rows > 0) {
         _torrenttable($r, TOP_10_BSPEED);
-        echo "<br /><br />";
+        echo "<br />";
     }
     $r = $db->query("SELECT summary.info_hash AS hash, summary.seeds AS seeds, summary.leechers AS leechers, summary.finished, summary.dlbytes AS dwned, namemap.filename AS name, namemap.url AS url, namemap.info, summary.speed AS speed, namemap.uploader FROM summary LEFT  JOIN namemap ON summary.info_hash = namemap.info_hash WHERE external = 'no' ORDER BY speed ASC, seeds DESC LIMIT 10") or sqlerr();
     if ($r->num_rows > 0) {
         _torrenttable($r, TOP_10_WSPEED);
-        echo "<br /><br />";
+        echo "<br />";
     }
 }
 stdfoot();

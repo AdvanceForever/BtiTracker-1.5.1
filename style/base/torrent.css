@@ -1,11 +1,130 @@
 body {
-    font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+    margin: 0px;
+    padding: 70px 0px 0px;
+    color: #413F36;
+    background-color: #F4EFD6;
+    background-image: url("images/bg.jpg");
+    font-family: Arial;
     font-size: 12px;
-    line-height: 1;
-    background-image: url(images/bg.jpg);
+    line-height: 20px;
+}
+
+#bodywrap {
+    width: 100%;
+    float: left;
+    background-image: url("images/bg-2.jpg");
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-position: center top;
+    padding: 56px 0px 0px;
+}
+
+#bottom-bg {
+    width: 100%;
+    float: left;
+    background-image: url("images/bg-3.jpg");
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    padding-bottom: 90px;
+}
+
+#wrapper2 {
+    width: 950px;
+    margin: auto;
+    margin-top: -5px;
+    position: relative;
+    background-image: url("images/wrapper-bg.jpg");
+    background-repeat: repeat;
+    border: solid 8px #DDD5BA;
+    outline: 1px solid #C7BEA2;
+}
+
+.stats {
+    background: #B6665B url("images/stats-bg.jpg") repeat scroll 0% 0%;
+    font-size: 12px;
     color: #FFF;
+    float: right;
+    text-transform: lowercase;
+    padding: 1px 5px 4px 5px;
+    height: 36px;
+    font-family: Georgia;
+    font-style: italic;
+    margin-top: 3px;
+}
+
+#pages-inside ul li a:link, #pages-inside ul li a:visited, #pages-inside ul li a:active {
+    float: left;
+    display: block;
+    height: 31px;
+    font-size: 18px;
+    padding: 10px 15px 0px;
+    margin: 0px;
+    font-weight: bold;
+    text-transform: lowercase;
+    color: #413F36;
+}
+
+.home-link a, .current_page_item a:link, #pages .current_page_item a:visited {
+    background-color: #66614E;
+    color: #FFF !important;
+    background-image: url("images/nav-hover-bg.gif");
+}
+
+.nav a {
+    display: block;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+    color: #6B9E8E;
+}
+
+#pages {
+    width: 100%;
+    float: left;
+    height: 59px;
+    background-image: url("images/nav-bg.jpg");
+    margin-top: 7px;
+}
+
+#pages-inside {
+    width: 950px;
+    margin: auto;
+}
+
+#pages-inside ul {
+    list-style-type: none;
+    list-style-image: none;
+    padding: 0px;
+    margin: 8px 0px 0px;
+}
+
+#pages-inside ul li {
+    float: left;
+    display: block;
+    height: 41px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.nav, .nav * {
+    margin: 0px;
+    padding: 0px;
+    list-style: outside none none;
+}
+
+.nav li {
+    float: left;
+    position: relative;
+    z-index: 99;
+}
+
+ul {
+    list-style-image: url("images/bullet.gif");
+    line-height: 23px;
+}
+
+ol, ul {
+    list-style: outside none none;
 }
 
 #new-message {
@@ -22,7 +141,9 @@ body {
 }
 
 .block_head {
-    background: #121212 none repeat scroll 0% 0%;
+    color: #C7BEA2;
+    background: #C7BEA2 none repeat scroll 0% 0%;
+    background-image: url("images/block-bg.gif");
     position: relative;
     z-index: 1;
     border: 1px solid #2A2A2A;
@@ -31,7 +152,7 @@ body {
 }
 
 td.bord {
-   border: 1px solid #121212;
+   border: 1px solid #C7BEA2;
 }
 
 #mainNavigation ul {
@@ -58,12 +179,10 @@ ul, ol {
     text-transform: uppercase;
 }
 
-#logo {
-    position: relative;
-}
-
 .logo {
-    margin-bottom: 10px;
+    width: 950px;
+    height: 65px;
+    margin: auto;
 }
 
 .text-center {
@@ -103,7 +222,6 @@ ul, ol {
     padding-top: 14px;
     bottom: 0px;
     z-index: 2 !important;
-}
 }
 
 .row {
@@ -162,9 +280,6 @@ div#mainNavigation {
     padding: 0px 30px;
 }
 
-a:link,a:active,a:visited { text-decoration: none; color: #FFF; }
-a:hover        { text-decoration: none; color: #126892; }
-
 h1 {
     font-size: 12pt;
 }
@@ -205,13 +320,11 @@ table.lista {
 }
 
 td.block {
-         border:1px solid #345487;
-         background-color: #3860BB;
-         background-image:url(block_back.gif);
-         padding:0px;
-         margin:0px;
-         font-size: 12pt;
-         color: #3939AA;
+   font-weight: bold;
+   color: #C7BEA2;
+   padding: 7px;
+   margin: 0px;
+   background-color: #413F36;
 }
 
 td.blocklist {
@@ -224,8 +337,9 @@ td.blocklist {
 }
 
 td.lista {
-    color : #FFFFFF;
+    color : #413F36;
     font-size: 8pt;
+    background-color: #C7BEA2;
 }
 
 td {
@@ -233,10 +347,10 @@ td {
 
 td.header {
            font-weight:bold;
-           color:#3A4F6C;
+           color:#C7BEA2;
            padding:7px;
            margin:0px;
-           background-color: #121212;
+           background-color: #413F36;
 }
 
 td.title {

@@ -6,34 +6,33 @@
 * Copyright (C) 2004-2015 Btiteam.org
 */
 
-if (file_exists("install.me"))
-{
-    if (dirname($_SERVER["PHP_SELF"]) == "/" || dirname($_SERVER["PHP_SELF"]) == "\\")
-        header("Location: http://" . $_SERVER["HTTP_HOST"] . "/install/");
+if (file_exists('install.me')) {
+    if (dirname(security::esc_url($_SERVER['PHP_SELF'])) == '/' || dirname(security::esc_url($_SERVER['PHP_SELF'])) == '\\')
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/install/');
     else
-        header("Location: http://" . $_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]) . "/install/");
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . dirname(security::esc_url($_SERVER['PHP_SELF'])) . '/install/');
     exit;
 }
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR . 'functions.php');
 require_once(INCL_PATH . 'blocks.php');
 
 dbconn(true);
 
-if (user::$current["id"] == 1)
-{
-    if ($_SERVER["REQUEST_URI"] == '/' || '/index.php')
-    {
+if (user::$current['id'] == 1) {
+    if ($_SERVER['REQUEST_URI'] == '/' || '/index.php') {
         redirect('login.php');
-    } else if ($_SERVER["REQUEST_URI"] == '/login.php') {
-       redirect('login.php');
+    } elseif ($_SERVER['REQUEST_URI'] == '/login.php') {
+        redirect('login.php');
     }
 }
 
-standardheader('Index', true, 0);
+if (user::$current['id']) {
+    standardheader('Index', true, 0);
 
-center_menu();
+    center_menu();
 
-stdfoot();
+    stdfoot();
+}
 
 ?>

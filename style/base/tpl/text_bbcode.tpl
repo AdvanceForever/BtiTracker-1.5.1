@@ -156,7 +156,7 @@
 	</script>
 <table cellpadding="5" cellspacing="0" align="center"  border="1" class="bb_holder">
   <tr>
-    <td width="100%" style="background:#CCCCCC; padding:0" colspan="2">
+    <td width="100%" style="padding:0" colspan="2">
     <div style="float:left;padding:4px 0px 0px 2px;"> 
         <img class="bb_icon" src="images/bbcode/bold.png" onclick="tag('b')" title="Bold" alt="B" /> 
         <img class="bb_icon" src="images/bbcode/italic.png" onclick="tag('i')" title="Italic" alt="I" /> 
@@ -173,7 +173,7 @@
      </td>
   </tr>
   <tr>
-    <td width="100%" style="background:#CCCCCC; padding:0;" colspan="2">
+    <td width="100%" style="padding:0;" colspan="2">
     <div style="float:left;padding:4px 0px 0px 2px;">
     	<select name="fontface" id="fontface"  class="bb_icon" onchange="font('face',this.value);" title="Font face">
           <option value="0">Font face</option>
@@ -229,50 +229,50 @@
      </div></td>
   </tr>
   <tr>
-    <td><textarea id="{$text}" name="{$text}" style="width:400px; height:250px;font-size:12px;">{$content}</textarea></td>
-	<td align="center" valign="top">
-		<table width="0" cellpadding="2" border="1" class="em_holder" cellspacing="2">
-	<tr>
-      <td align="center"><a href="javascript:em(':angry:');" ><img border="0" alt=" " src="images/smilies/angry.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':|');" ><img border="0" alt=" " src="images/smilies/blank.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':D');" ><img border="0" alt=" " src="images/smilies/biggrin.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':blush:');" ><img border="0" alt=" " src="images/smilies/blush.gif" /></a></td>
+    <td><textarea id="{$text}" name="{$text}" style="width:400px;height:250px;font-size:12px;">{$content}</textarea></td>
+    <td align="center" valign="top">
+   <table width="0" cellpadding="2" border="1" class="em_holder" cellspacing="2">
+   <tr>
+      <td align="center"><a href="javascript:em(':)');"><img border="0" src="images/smilies/smile.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':D');"><img border="0" src="images/smilies/smilegrin.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':angel:');"><img border="0" src="images/smilies/angel.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':angry:');"><img border="0" src="images/smilies/angry.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':cool:');" ><img border="0" alt=" " src="images/smilies/cool.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':((');" ><img border="0" alt=" " src="images/smilies/crying.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':<<:');" ><img border="0" alt=" " src="images/smilies/eyesright.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':frown:');" ><img border="0" alt=" " src="images/smilies/frown.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':confused:');"><img border="0" src="images/smilies/confused.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':crying:');"><img border="0" src="images/smilies/crying.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':hugleft:');"><img border="0" src="images/smilies/hugleft.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':clown:');"><img border="0" src="images/smilies/clown.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em('<3');" ><img border="0" alt=" " src="images/smilies/heart.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':unsure:');" ><img border="0" alt=" " src="images/smilies/hmm.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':lol:');" ><img border="0" alt=" " src="images/smilies/laughing.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':ninja:');" ><img border="0" alt=" " src="images/smilies/ninja.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':cool:');"><img border="0" src="images/smilies/cool.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':devilish:');"><img border="0" src="images/smilies/devilish.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':embarrassed:');"><img border="0" src="images/smilies/embarrassed.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':glasses:');"><img border="0" src="images/smilies/glasses.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':no:');" ><img border="0" alt=" " src="images/smilies/no.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':nod:');" ><img border="0" alt=" " src="images/smilies/nod.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':ohno:');" ><img border="0" alt=" " src="images/smilies/ohnoes.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':omg:');" ><img border="0" alt=" " src="images/smilies/omg.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':hugright:');"><img border="0" src="images/smilies/hugright.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':kiss:');"><img border="0" src="images/smilies/kiss.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':lol:');"><img border="0" src="images/smilies/laughing.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':love:');"><img border="0" src="images/smilies/love.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':O');" ><img border="0" alt=" " src="images/smilies/ohshit.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':(');" ><img border="0" alt=" " src="images/smilies/sad.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':shifty:');" ><img border="0" alt=" " src="images/smilies/shifty.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':sick:');" ><img border="0" alt=" " src="images/smilies/sick.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':martini:');"><img border="0" src="images/smilies/martini.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':ninja:');"><img border="0" src="images/smilies/ninja.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':pirate:');"><img border="0" src="images/smilies/pirate.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':plain:');"><img border="0" src="images/smilies/plain.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':)');" ><img border="0" alt=" " src="images/smilies/smile.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':P');" ><img border="0" alt=" " src="images/smilies/tongue.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':wave:');" ><img border="0" alt=" " src="images/smilies/wave.gif" /></a></td>
-      <td align="center"><a href="javascript:em(';)');" ><img border="0" alt=" " src="images/smilies/wink.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':quiet:');"><img border="0" src="images/smilies/quiet.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':raspberry:');"><img border="0" src="images/smilies/raspberry.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':sad:');"><img border="0" src="images/smilies/sad.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':sick:');"><img border="0" src="images/smilies/sick.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':creepy:');" ><img border="0" alt=" " src="images/smilies/creepy.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':worried:');" ><img border="0" alt=" " src="images/smilies/worried.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':wtf:');" ><img border="0" alt=" " src="images/smilies/wtf.gif" /></a></td>
-      <td align="center"><a href="javascript:em(':wub:');" ><img border="0" alt=" " src="images/smilies/wub.gif" /></a></td>
+      <td align="center"><a href="javascript:em(':sleeping:');"><img border="0" src="images/smilies/sleeping.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':smilebig:');"><img border="0" src="images/smilies/smilebig.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':smirk:');"><img border="0" src="images/smilies/smirk.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':surprise:');"><img border="0" src="images/smilies/surprise.svg" /></a></td>
     </tr>
 	</table>
 	</td>

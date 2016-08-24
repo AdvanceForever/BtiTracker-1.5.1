@@ -33,7 +33,7 @@ if (!user::$current || user::$current["view_users"] == "no") {
 		
         if ($res) {
             while ($ruser = $res->fetch_row()) {
-                $users .= (($regusers > 0 ? ", " : "") . "\n<a href='userdetails.php?id=" . (int)$ruser[1] . "'>" . StripSlashes($ruser[2] . $ruser[0] . $ruser[3]) . "</a>");
+                $users .= (($regusers > 0 ? ", " : "") . "\n<a href='userdetails.php?id=" . (int)$ruser[1] . "'>" . StripSlashes($ruser[2] . $ruser[0] . $ruser[3]) . "</a>" . Warn_disabled($ruser[1]));
                 $regusers++;
             }
         }
