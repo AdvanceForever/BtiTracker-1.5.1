@@ -572,6 +572,9 @@ CREATE TABLE `namemap` (
   `lastsuccess` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `free` enum('yes','no') COLLATE utf8_unicode_ci DEFAULT 'no',
   `genre` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `requested` enum('true','false') NOT NULL default 'false',
+  `nuked` enum('true','false') NOT NULL default 'false',
+  `nuke_reason` varchar(100) default NULL,
   `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
