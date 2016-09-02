@@ -124,6 +124,15 @@ if (isset($_FILES['torrent'])) {
     $announce  = $array['announce'];
     $anonyme   = sqlesc($_POST['anonymous']);
     $curuid    = user::$current['uid'];
+
+    $req = trim($_POST['requested']);
+    $nuke = trim($_POST['nuked']);
+
+    if ($nuke == 'true') {
+        $nuke_reason = $db->real_escape_string($_POST['nuked_reason']);
+    } else {
+        $nuke_reason = '';
+    }
     
     if ($categoria == 0) {
         err_msg(ERROR, WRITE_CATEGORY);
@@ -148,9 +157,9 @@ if (isset($_FILES['torrent'])) {
     }
 
     if (in_array($announce, $TRACKER_ANNOUNCEURLS))
-        $query = "INSERT INTO namemap (info_hash, filename, image, url, info, category, data, size, comment, uploader, anonymous, genre) VALUES ('" . $hash . "', '" . $filename . "', '" . $image . "', '" . $url . "', '" . $info . "', 0 + " . $categoria . ", NOW(), '" . $size . "', '" . $comment . "', " . $curuid . ", " . $anonyme . ", '" . $db->real_escape_string($_POST['genre']) . "')";
+        $query = "INSERT INTO namemap (info_hash, filename, image, url, info, category, data, size, comment, uploader, anonymous, genre, requested, nuked, nuke_reason) VALUES ('" . $hash . "', '" . $filename . "', '" . $image . "', '" . $url . "', '" . $info . "', 0 + " . $categoria . ", NOW(), '" . $size . "', '" . $comment . "', " . $curuid . ", " . $anonyme . ", '" . $db->real_escape_string($_POST['genre']) . "', '" . $req . "', '" . $nuke . "', '" . $nuke_reason . "')";
     else
-        $query = "INSERT INTO namemap (info_hash, filename, image, url, info, category, data, size, comment, external, announce_url, uploader, anonymous, genre) VALUES ('" . $hash . "', '" . $filename . "', '" . $image . "', '" . $url . "', '" . $info . "', 0 + " . $categoria . ", NOW(), '" . $size . "', '" . $comment . "', 'yes', '" . $announce . "', " . $curuid . ", " . $anonyme . ", '" . $db->real_escape_string($_POST['genre']) . "')";
+        $query = "INSERT INTO namemap (info_hash, filename, image, url, info, category, data, size, comment, external, announce_url, uploader, anonymous, genre, requested, nuked, nuke_reason) VALUES ('" . $hash . "', '" . $filename . "', '" . $image . "', '" . $url . "', '" . $info . "', 0 + " . $categoria . ", NOW(), '" . $size . "', '" . $comment . "', 'yes', '" . $announce . "', " . $curuid . ", " . $anonyme . ", '" . $db->real_escape_string($_POST['genre']) . "', '" . $req . "', '" . $nuke . "', '" . $nuke_reason . "')";
 	
     $status = makeTorrent($hash, true);
     quickQuery($query);
@@ -217,6 +226,9 @@ function endOutput() {
     $smarty->assign('torrent_check', TORRENT_CHECK);
     $smarty->assign('send', FRM_SEND);
     $smarty->assign('reset', FRM_RESET);
+    $smarty->assign('torrent_requested', TORRENT_REQUESTED);
+    $smarty->assign('torrent_nuked', TORRENT_NUKED);
+    $smarty->assign('nuked_requested', ($GLOBALS['nuked_requested'] == 'yes'));
 
     $smarty->display($STYLEPATH . '/tpl/torrent/upload.tpl');
 
