@@ -37,6 +37,27 @@
    <td class="lista" ><input type='text' name='genre' size='20' maxlength='50' /></td>
 </tr>
 {/if}
+{if $nuked_requested}
+<tr>
+   <td class='header'>{$torrent_requested}</td>
+   <td class='lista'>
+      <select name='requested' size='1'>
+         <option value='false' selected='selected'>{$no}</option>
+         <option value='true'>{$yes}</option>
+      </select>
+   </td>
+</tr>
+<tr>
+   <td class='header'>{$torrent_nuked}</td>
+   <td class='lista'>
+      <select name='nuked' size='1'>
+         <option value='false' selected='selected'>{$no}</option>
+         <option value='true'>{$yes}</option>
+      </select>
+      &nbsp;<input type='text' name='nuked_reason' size='43' maxlength='100'>
+   </td>
+</tr>
+{/if}
 <tr>
    <td class='header' valign='top'>{$description}</td>
    <td class='lista' align='left'>{$description_body}</td>
