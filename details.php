@@ -246,7 +246,7 @@ if (file_exists($row["url"])) {
         }
     }
     print("</table></div>
-    <div name='msgfile' style='display:block' id='msgfile' align='center'>" . $numfiles . "" . ($numfiles == 1 ? " file" : " files") . "</div>
+    <div name='msgfile' style='display:block' id='msgfile' align='left'>" . $numfiles . "" . ($numfiles == 1 ? " file" : " files") . "</div>
     </td></tr>\n");
 }
 // end files in torrents
