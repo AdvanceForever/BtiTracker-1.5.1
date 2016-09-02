@@ -629,5 +629,8 @@ define("REPORT_CLICK", "Click");
 define("GENRE", "Genre");
 define("FORUM_USERS", "Active Users on Forum");
 define("IMAGE_URL", "Image Link");
+define("TORRENT_REQUESTED", "Requested");
+define("TORRENT_NUKED", "Nuked");
+define("TORRENT_NUKED_REASON", "Reason");
 
 ?>
