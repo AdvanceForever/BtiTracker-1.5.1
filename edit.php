@@ -37,6 +37,19 @@ if ((isset($_POST["comment"])) && (isset($_POST["name"]))) {
         write_log("Modified torrent " . $fname . " (" . $torhash . ")", "modify");
         echo "<center>".PLEASE_WAIT."</center>";
 
+        if ($GLOBALS['nuked_requested'] == 'yes') {
+            $req = trim($_POST['request']);
+            $nuked = trim($_POST['nuke']);
+            $nuke_reason = $db->real_escape_string($_POST['nuked_reason']);
+
+            if ($_POST['nuke'] == 'false')	{
+                $db->query("UPDATE namemap SET requested = '" . $req . "', nuked = '" . $nuked . "' WHERE info_hash = '" . $torhash . "'");
+                $db->query("UPDATE namemap SET nuke_reason = NULL WHERE info_hash = '" . $torhash . "'");
+            } else {
+                $db->query("UPDATE namemap SET requested = '" . $req . "', nuked = '" . $nuked . "', nuke_reason = '" . $nuke_reason . "' WHERE info_hash = '" . $torhash . "'");
+            }
+        }
+
         //Golden Torrents by CobraCRK
         $free = unesc($_POST['free']);
         if (is_null($free)) {
@@ -64,6 +77,7 @@ if ((isset($_POST["comment"])) && (isset($_POST["name"]))) {
         MCached::del('torrent::details::' . $torhash);
         MCached::del('torrent::details::image::' . $torhash);
         MCached::del('is::freeleech::' . $torhash);
+        MCached::del('torrent::details::nuked::requested::' . $torhash);
 
 	print("<script language='javascript'>window.location.href='" . $link . "'</script>");
         exit();
@@ -87,7 +101,7 @@ if ($GLOBALS['freeleech'] == 'yes') {
 
 // view torrent's details
 if (isset($_GET["info_hash"])) {
-    $query = "SELECT " . $genre . " " . $freel . " namemap.info_hash, namemap.filename, namemap.image, namemap.url, UNIX_TIMESTAMP(namemap.data) AS data, namemap.size, namemap.comment, namemap.category AS cat_name, summary.seeds, summary.leechers, summary.finished, summary.speed, namemap.uploader FROM namemap LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN summary ON summary.info_hash = namemap.info_hash WHERE namemap.info_hash = '" . AddSlashes($_GET["info_hash"]) . "'";
+    $query = "SELECT " . $genre . " " . $freel . " namemap.requested, namemap.nuked, namemap.nuke_reason, namemap.info_hash, namemap.filename, namemap.image, namemap.url, UNIX_TIMESTAMP(namemap.data) AS data, namemap.size, namemap.comment, namemap.category AS cat_name, summary.seeds, summary.leechers, summary.finished, summary.speed, namemap.uploader FROM namemap LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN summary ON summary.info_hash = namemap.info_hash WHERE namemap.info_hash = '" . AddSlashes($_GET["info_hash"]) . "'";
     $res = $db->query($query) or die(CANT_DO_QUERY);
     $results = $res->fetch_array(MYSQLI_BOTH);
 
@@ -122,7 +136,7 @@ if (isset($_GET["info_hash"])) {
 <?php } ?>
 
 	<tr>
-        <td align='right' class='header'><?php echo INFO_HASH;?>:</td><td class='lista'><?php echo security::html_safe($results["info_hash"]);  ?></td>
+        <td align='right' class='header'><?php echo INFO_HASH;?>:</td><td class='lista'><?php echo security::html_safe($results["info_hash"]); ?></td>
         </tr><tr>
         <td align='right' class='header'><?php echo DESCRIPTION; ?>:</td><td class='lista'><?php textbbcode("edit", "comment", security::html_safe(unesc($results["comment"]))) ?></td>
         </tr>
@@ -134,6 +148,32 @@ if (isset($_GET["info_hash"])) {
         categories($results['cat_name']);
         
         echo "</td>";
+
+        if ($GLOBALS['nuked_requested'] == 'yes') {
+            if ($results['requested'] == 'true') {
+                $selected = " selected='selected'";
+            } else {
+                $selected = '';
+            }
+
+            print("<tr><td class='header' align='right'>" . TORRENT_REQUESTED . ":</td><td class='lista' align='left'>");
+            print("<select name='request' size='1'>");
+            print("<option value='false'" . $selected . ">" . NO . "</option>");
+            print("<option value='true'" . $selected . ">" . YES . "</option>");
+            print("</select></td></tr>");
+
+            if ($results['nuked'] == 'true') {
+                $selected = " selected='selected'";
+            } else {
+                $selected = '';
+            }
+
+            print("<tr><td class='header' align='right'>" . TORRENT_NUKED . ":</td><td class='lista' align='left'>");
+            print("<select name='nuke' size='1'>");
+            print("<option value='false'" . $selected . ">" . NO . "</option>");
+            print("<option value='true'" . $selected . ">" . YES . "</option>");
+            print("</select>&nbsp;<input type='text' name='nuked_reason' value='" . security::html_safe($results['nuke_reason']) . "' size='43' maxlength='100'></td></tr>");
+        }
 
         //Golden Torrents by CobraCRK
         if (user::$current['edit_torrents'] == 'yes' && $GLOBALS['freeleech'] == 'yes') {
