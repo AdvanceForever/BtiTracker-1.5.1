@@ -151,9 +151,9 @@ if ($count) {
     }
 
     if ($SHOW_UPLOADER)
-        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, namemap.anonymous, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader AS upname, users.username AS uploader, prefixcolor, suffixcolor FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN users ON users.id = namemap.uploader LEFT JOIN users_level ON users.id_level=users_level.id " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
+        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, namemap.anonymous, namemap.requested, namemap.nuked, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader AS upname, users.username AS uploader, prefixcolor, suffixcolor FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN users ON users.id = namemap.uploader LEFT JOIN users_level ON users.id_level=users_level.id " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
     else
-        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
+        $query = "SELECT " . $genre . " namemap.free AS free, summary.info_hash AS hash, summary.seeds, summary.leechers, summary.finished AS finished, summary.dlbytes AS dwned, namemap.filename, namemap.url, namemap.info, namemap.requested, namemap.nuked, summary.speed, UNIX_TIMESTAMP( namemap.data ) AS added, categories.image, categories.name AS cname, namemap.category AS catid, namemap.size, namemap.external, namemap.uploader FROM summary LEFT JOIN namemap ON summary.info_hash = namemap.info_hash LEFT JOIN categories ON categories.id = namemap.category " . $where . " ORDER BY " . $order . " " . $by . " " . $limit;
 
    $results = $db->query($query) or err_msg(ERROR, CANT_DO_QUERY . "<br />" . $query);
 }
@@ -218,10 +218,23 @@ if ($count) {
 
     while ($data = $results->fetch_array(MYSQLI_BOTH)) {
          if ($data['free'] == 'yes') {
-	     $golden = "<font color='lime' size='1'>Freeleech</font> ";	
-	 } else {
+	         $golden = "<button class='tfreeleech'>Free</button> ";	
+	     } else {
              $golden = '';
          }
+
+         if ($data['requested'] == 'true') {
+             $is_req = "<button class='trequested'>Request</button> ";
+         } else {
+             $is_req = '';
+         }
+
+         if ($data['nuked'] == 'true') {
+             $is_nuke = "<button class='tnuked'>Nuked</button> ";
+         } else {
+             $is_nuke = '';
+         }
+
 
         $commentdata = MCached::get('torrent::comments::count::' . $data['hash']);
         if ($commentdata === MCached::NO_RESULT) {
@@ -238,7 +251,7 @@ if ($count) {
 
         echo "<tr>\n";
         echo "\t<td align='center' class='lista'><a href='torrents.php?category=" . (int)$data['catid'] . "'>" . image_or_link(($data["image"] == "" ? "" : "images/categories/" . $data["image"]), "", security::html_safe($data["cname"])) . "</td>";
-        echo "\t<td align='left' class='lista'><a href='details.php?id=" . $data["hash"] . "' title='" . VIEW_DETAILS . ": " . security::html_safe($data["filename"]) . "'>" . security::html_safe($data["filename"]) . "</a>" . ($data["external"] == "no" ? "" : " (<span style='color:red'>EXT</span>)") . " " . $golden . "" . $display_genre . "</td>";
+        echo "\t<td align='left' class='lista'><a href='details.php?id=" . $data["hash"] . "' title='" . VIEW_DETAILS . ": " . security::html_safe($data["filename"]) . "'>" . security::html_safe($data["filename"]) . "</a>" . ($data["external"] == "no" ? "" : " (<span style='color:red'>EXT</span>)") . " " . $golden . " " . $is_nuke . " " . $is_req . "" . $display_genre . "</td>";
 
     if ($commentdata) {
         if ($commentdata["comments"] > 0) {
@@ -331,8 +344,8 @@ if ($count) {
 
     if ($data["external"] == "no")
     {
-        echo "\t<td align='center' class='" . linkcolor($data["seeds"]) . "'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["seeds"] . "</a></td>\n";
-        echo "\t<td align='center' class='" . linkcolor($data["leechers"]) . "'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["leechers"] . "</a></td>\n";
+        echo "\t<td align='center' class='lista'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["seeds"] . "</a></td>\n";
+        echo "\t<td align='center' class='lista'><a href='peers.php?id=" . $data["hash"] . "' title='" . PEERS_DETAILS . "'>" . (int)$data["leechers"] . "</a></td>\n";
 
 	if ($data["finished"] > 0)
             echo "\t<td align='center' class='lista'><a href='torrent_history.php?id=" . $data["hash"] . "' title='History - " . security::html_safe($data["filename"]) . "'>" . number_format((int)$data["finished"], 0) . "</a></td>";
