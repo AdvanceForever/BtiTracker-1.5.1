@@ -55,6 +55,7 @@ if (isset($_POST["action"])) {
         
         MCached::del('torrent::details::' . $hash);
         MCached::del('torrent::details::image::' . $hash);
+        MCached::del('torrent::details::nuked::requested::' . $hash);
         
         unlink($TORRENTSDIR . "/" . $hash . ".btf");
         
