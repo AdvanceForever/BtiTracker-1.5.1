@@ -56,6 +56,15 @@ if ($cache === MCached::NO_RESULT) {
     MCached::add('torrent::details::' . $id, $cache, 43200);
 }
 
+if ($GLOBALS['nuked_requested'] == 'yes') {
+    $resnr = MCached::get('torrent::details::nuked::requested::' . $id);
+    if ($resnr === MCached::NO_RESULT) {
+        $res_nr = $db->query("SELECT requested, nuked, nuke_reason FROM namemap WHERE info_hash = '" . $id . "'");
+        $resnr = $res_nr->fetch_assoc();
+        MCached::add('torrent::details::nuked::requested::' . $id, $resnr, 14400);
+    }
+}
+
 if (!$row)
     die("Bad ID!");
 
@@ -79,6 +88,27 @@ if (user::$current["uid"] > 1 && (user::$current["uid"] == $row["uploader"] || u
 print("</td><td class='lista' align='left'>" . security::html_safe($cache["filename"]) . "</td></tr>\n");
 print("<tr><td align='right' class='header'> " . TORRENT . ":</td><td class='lista' align='left'><a href='download.php?id=" . $row["info_hash"] . "&f=" . rawurlencode($cache["filename"]) . ".torrent'>" . security::html_safe($cache["filename"]) . "</a></td></tr>\n");
 print("<tr><td align='right' class='header'> " . INFO_HASH . ":</td><td class='lista' align='left'>" . security::html_safe($row["info_hash"]) . "</td></tr>\n");
+
+if ($GLOBALS['nuked_requested'] == 'yes') {
+    if ($resnr['requested'] == 'true') {
+        $req = YES;
+    } else {
+        $req = NO;
+    }
+
+    if ($resnr['nuked'] == 'true') {
+        $nuke = YES;
+    } else {
+        $nuke = NO;
+    }
+
+   print("<tr><td align='right' class='header'>" . TORRENT_REQUESTED . ":</td><td align='left' class='lista'>" . $req . "</td></tr>\n");
+   print("<tr><td align='right' class='header'>" . TORRENT_NUKED . ":</td><td align='left' class='lista' >" . $nuke . "</td></tr>\n");
+
+   if ($resnr['nuked'] == 'true') {
+       print("<tr><td align='right' class='header'>" . TORRENT_NUKED_REASON . ":</td><td align='left' class='lista'>" . security::html_safe($resnr['nuke_reason']) . "</td></tr>\n");
+   }
+}
 
 if ($GLOBALS['image_link'] == 'yes') {
     $row1 = MCached::get('torrent::details::image::' . $id);
