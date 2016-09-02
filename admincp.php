@@ -634,6 +634,11 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
            <td class='lista'> Yes <input type='radio' name='image_link' value='yes' <?php if ($GLOBALS['image_link'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='image_link' value='no' <?php if ($GLOBALS['image_link'] == 'no') echo 'checked'; ?> /></td>
         </tr>
 
+        <tr>
+           <td class='header'>Torrent Nuked Requested:</td>
+           <td class='lista'> Yes <input type='radio' name='nuked_requested' value='yes' <?php if ($GLOBALS['nuked_requested'] == 'yes') echo 'checked'; ?> />&nbsp;&nbsp; No <input type='radio' name='nuked_requested' value='no' <?php if ($GLOBALS['nuked_requested'] == 'no') echo 'checked'; ?> /></td>
+        </tr>
+
     <?php
         print("\n<tr><td align='center' class='header'><input type='submit' name='write' value='" . FRM_CONFIRM . "' /></td><td align='center' class='header'><input type='submit' name='invia' value='" . FRM_CANCEL . "' /></td></tr>");
         print("</table></form>");
@@ -794,6 +799,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
             $foutput .= "\$GLOBALS['users_on_forum'] = '" . $_POST["users_on_forum"] . "';\n";
             $foutput .= "\$GLOBALS['users_on_topic'] = '" . $_POST["users_on_topic"] . "';\n";
             $foutput .= "\$GLOBALS['image_link'] = '" . $_POST["image_link"] . "';\n";
+            $foutput .= "\$GLOBALS['nuked_requested'] = '" . $_POST["nuked_requested"] . "';\n";
             $foutput .= "\n?>";
             fwrite($fd, $foutput) or die(CANT_SAVE_CONFIG);
             fclose($fd);
