@@ -19,12 +19,14 @@ $arr = $res->fetch_assoc();
 $voted = $arr;
 
 if ($voted) {
-    echo "<br><p>You've already voted for this request, only 1 vote for each request is allowed</p><p>Back to <a href=viewrequests.php><b>Requests</b></a></p><br><br>";
+    $smarty->display($STYLEPATH . '/tpl/tracker/request_voted.tpl');
 } else {
     $db->query("UPDATE requests SET hits = hits + 1 WHERE id = " . $requestid) or sqlerr();
     @$db->query("INSERT INTO addedrequests VALUES(0, " . $requestid . ", " . $userid . ")") or sqlerr();
 
-    print("<br><p>Successfully voted for request " . $requestid . "</p><p>Back to <a href=viewrequests.php><b>Requests</b></a></p><br><br>");
+    $smarty->assign('vrequest_id', $requestid);
+
+    $smarty->display($STYLEPATH . '/tpl/tracker/vote_request.tpl');
 }
 
 end_frame();
