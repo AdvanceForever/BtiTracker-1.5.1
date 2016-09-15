@@ -632,5 +632,6 @@ define("IMAGE_URL", "Image Link");
 define("TORRENT_REQUESTED", "Requested");
 define("TORRENT_NUKED", "Nuked");
 define("TORRENT_NUKED_REASON", "Reason");
+define("VOTE_FOR_THIS", "Vote for this");
 
 ?>
