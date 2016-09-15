@@ -865,7 +865,7 @@ function get_elapsed_time($ts) {
 }
 
 function sql_timestamp_to_unix_timestamp($s) {
-    return mktime(utf8::substr($s, 11, 2), utf8::substr($s, 14, 2), utf8::substr($s, 17, 2), utf8::substr($s, 5, 2), utf8::substr($s, 8, 2), utf8::substr($s, 0, 4));
+    return mktime(substr((int)$s, 11, 2), substr((int)$s, 14, 2), substr((int)$s, 17, 2), substr((int)$s, 5, 2), substr((int)$s, 8, 2), substr((int)$s, 0, 4));
 }
 
 function gmtime() {
