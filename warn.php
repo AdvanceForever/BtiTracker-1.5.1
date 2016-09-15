@@ -133,7 +133,7 @@ if (!user::$current || user::$current["admin_access"] == "no" || user::$current[
             redirect($url);
         } elseif ($action == "admincpremovewarn") {
             if (empty($_POST["remwarn"])) {
-                $url = "admincp.php?do=warnedu";
+                $url = 'admincp.php?user=' . user::$current['uid'] . '&code=' . user::$current['random'] . '&do=warnedu';
                 redirect($url);
             } else {
                 //get data for queries
