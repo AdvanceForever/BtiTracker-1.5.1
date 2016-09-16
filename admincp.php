@@ -74,54 +74,41 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
     </script>
 
     <?php
-    if (isset($_GET["do"]))
-        $do = security::html_safe($_GET["do"]);
+    if (isset($_GET['do']))
+        $do = security::html_safe($_GET['do']);
     else
-        $do = "";
+        $do = '';
 
-    if (isset($_GET["action"]))
-        $action = security::html_safe($_GET["action"]);
+    if (isset($_GET['action']))
+        $action = security::html_safe($_GET['action']);
     
     // begin the real admin page
     block_begin(ADMIN_CPANEL);
-    print("\n<table class='lista' width='100%' align='center'><tr>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=config&action=read'>" . ACP_TRACKER_SETTINGS . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=banip&action=read'>" . ACP_BAN_IP . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=category&action=read'>" . ACP_CATEGORIES . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=level&action=read'>" . ACP_USER_GROUP . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=language&action=read'>" . ACP_LANGUAGES . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=polls&action=read'>" . ACP_POLLS . "</a></td>");
-    print("</tr><tr>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=style&action=read'>" . ACP_STYLES . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=forum&action=read'>" . ACP_FORUM . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=badwords&action=read'>" . ACP_CENSURED . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=blocks&action=read'>" . ACP_BLOCKS . "</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=dbutil'>Mysql Database<br />Stats/Utils</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=masspm&action=write'>Mass PM</a></td>");
-    print("</tr><tr>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=prunet'>Prune Torrents</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=pruneu'>Prune Users</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=logview'>View Sitelog</a></td>");
-    print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=searchdiff'>Search Diff.</a></td>");
 
-    if ($GLOBALS['duplicate_ips'] == 'yes') {
-        print("\n<td class='header' align='center'><a href='admin.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&action=duplicateips'>Duplicate IP's</a></td>");
-    }
+    $smarty->assign('admincpmenu_uid', user::$current['uid']);
+    $smarty->assign('admincpmenu_random', user::$current['random']);
 
-    if ($GLOBALS['hit_and_run'] == 'yes') {
-        print("\n<td class='header' align='center'><a href='admin.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&action=hitrun'>Hit &amp; Run Settings</a></td>");
-    }
+    #If's
+    $smarty->assign('duplicate_ips', ($GLOBALS['duplicate_ips'] == 'yes'));
+    $smarty->assign('hit_and_run', ($GLOBALS['hit_and_run'] == 'yes'));
+    $smarty->assign('warn_system', ($GLOBALS['warn_system'] == 'yes'));
 
-    //User Warning System Hack Start
-    if ($GLOBALS['warn_system'] == 'yes') {
-        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=warnedu'>" . ACP_WARNEDU . "</a></td>");
-        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=prevwarnedu'>" . ACP_PREVWARNEDU . "</a></td>");
-        print("\n<td class='header' align='center'><a href='admincp.php?user=" . user::$current["uid"] . "&code=" . user::$current["random"] . "&do=disabledu'>" . ACP_DISABLEDU . "</a></td>");
-    }
-    //User Warning System Hack Stop
+    #Lang
+    $smarty->assign('lang_settings', ACP_TRACKER_SETTINGS);
+    $smarty->assign('lang_ban_ip', ACP_BAN_IP);
+    $smarty->assign('lang_categories', ACP_CATEGORIES);
+    $smarty->assign('lang_user_group', ACP_USER_GROUP);
+    $smarty->assign('lang_languages', ACP_LANGUAGES);
+    $smarty->assign('lang_polls', ACP_POLLS);
+    $smarty->assign('lang_styles', ACP_STYLES);
+    $smarty->assign('lang_forum', ACP_FORUM);
+    $smarty->assign('lang_censured', ACP_CENSURED);
+    $smarty->assign('lang_blocks', ACP_BLOCKS);
+    $smarty->assign('lang_warnedu', ACP_WARNEDU);
+    $smarty->assign('lang_prevwarnedu', ACP_PREVWARNEDU);
+    $smarty->assign('lang_disabledu', ACP_DISABLEDU);
 
-
-    print("\n</tr></table>\n");
+    $smarty->display($STYLEPATH . '/tpl/admin/admincp_menu.tpl');
     
     if ($do == 'prunet') {
         include(ADMIN_PATH . 'prune_torrents.php');
