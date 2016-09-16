@@ -296,7 +296,7 @@ if ($GLOBALS['custom_title'] == 'yes') {
     $ctitle = '';
 }
 
-$subres = $db->query("SELECT users.custom_title, editedby, editedat, UNIX_TIMESTAMP(lastconnect) AS lastconnect, comments.id, text, UNIX_TIMESTAMP(added) AS data, user, " . $ctitle . " users.id AS uid FROM comments LEFT JOIN users ON comments.user = users.username WHERE info_hash = '" . $id . "' ORDER BY added ASC");
+$subres = $db->query("SELECT users.custom_title, users.id_level, editedby, editedat, UNIX_TIMESTAMP(lastconnect) AS lastconnect, comments.id, text, UNIX_TIMESTAMP(added) AS data, user, " . $ctitle . " users.id AS uid FROM comments LEFT JOIN users ON comments.user = users.username WHERE info_hash = '" . $id . "' ORDER BY added ASC");
 if (!$subres || $subres->num_rows == 0) {
     if (user::$current["uid"] > 1)
         $s = "<br />\n<table width='95%' class='lista'>\n<tr>\n<td align='center'>\n<a href='comment.php?id=" . $id . "&usern=" . urlencode(user::$current["username"]) . "'>" . NEW_COMMENT . "</a>\n</td>\n</tr>\n";
