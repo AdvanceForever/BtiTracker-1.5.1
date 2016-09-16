@@ -11,31 +11,31 @@ dbconn();
 
 standardheader('Edit Torrents');
 
-$scriptname = security::esc_url($_SERVER["PHP_SELF"]);
-$link = unesc($_GET["returnto"]);
+$scriptname = security::esc_url($_SERVER['PHP_SELF']);
+$link = unesc($_GET['returnto']);
 
-if ($link == "")
-    $link = "details.php?id=" . $row["info_hash"];
+if ($link == '')
+    $link = 'details.php?id=' . stripslashes($row['info_hash']);
 
-if ((isset($_POST["comment"])) && (isset($_POST["name"]))) {
-    if ($_POST["action"] == FRM_CONFIRM) {
-        if ($_POST["name"] == '') {
-            err_msg("Error!", "You must specify torrent name.");
+if ((isset($_POST['comment'])) && (isset($_POST['name']))) {
+    if ($_POST['action'] == FRM_CONFIRM) {
+        if ($_POST['name'] == '') {
+            err_msg('Error!', 'You must specify torrent name.');
             stdfoot();
             exit;
         }
 
-        if ($_POST["comment"] == '') {
-            err_msg("Error!","You must specify description.");
+        if ($_POST['comment'] == '') {
+            err_msg('Error!', 'You must specify description.');
             stdfoot();
             exit;
         }
 
-        $fname = sqlesc(security::html_safe($_POST["name"]));
-        $image = sqlesc(security::html_safe($_POST["image"]));
-        $torhash = AddSlashes($_POST["info_hash"]);
-        write_log("Modified torrent " . $fname . " (" . $torhash . ")", "modify");
-        echo "<center>".PLEASE_WAIT."</center>";
+        $fname = sqlesc(security::html_safe($_POST['name']));
+        $image = sqlesc(security::html_safe($_POST['image']));
+        $torhash = AddSlashes($_POST['info_hash']);
+        write_log('Modified torrent ' . $fname . ' (' . $torhash . ')', 'modify');
+        echo '<center>' . PLEASE_WAIT . '</center>';
 
         if ($GLOBALS['nuked_requested'] == 'yes') {
             $req = trim($_POST['request']);
@@ -79,7 +79,7 @@ if ((isset($_POST["comment"])) && (isset($_POST["name"]))) {
         MCached::del('is::freeleech::' . $torhash);
         MCached::del('torrent::details::nuked::requested::' . $torhash);
 
-	print("<script language='javascript'>window.location.href='" . $link . "'</script>");
+	    print("<script language='javascript'>window.location.href='" . $link . "'</script>");
         exit();
     } else {
         print("<script language='javascript'>window.location.href='" . $link . "'</script>");
@@ -100,8 +100,8 @@ if ($GLOBALS['freeleech'] == 'yes') {
 }
 
 // view torrent's details
-if (isset($_GET["info_hash"])) {
-    $query = "SELECT " . $genre . " " . $freel . " namemap.requested, namemap.nuked, namemap.nuke_reason, namemap.info_hash, namemap.filename, namemap.image, namemap.url, UNIX_TIMESTAMP(namemap.data) AS data, namemap.size, namemap.comment, namemap.category AS cat_name, summary.seeds, summary.leechers, summary.finished, summary.speed, namemap.uploader FROM namemap LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN summary ON summary.info_hash = namemap.info_hash WHERE namemap.info_hash = '" . AddSlashes($_GET["info_hash"]) . "'";
+if (isset($_GET['info_hash'])) {
+    $query = "SELECT " . $genre . " " . $freel . " namemap.requested, namemap.nuked, namemap.nuke_reason, namemap.info_hash, namemap.filename, namemap.image, namemap.url, UNIX_TIMESTAMP(namemap.data) AS data, namemap.size, namemap.comment, namemap.category AS cat_name, summary.seeds, summary.leechers, summary.finished, summary.speed, namemap.uploader FROM namemap LEFT JOIN categories ON categories.id = namemap.category LEFT JOIN summary ON summary.info_hash = namemap.info_hash WHERE namemap.info_hash = '" . AddSlashes($_GET['info_hash']) . "'";
     $res = $db->query($query) or die(CANT_DO_QUERY);
     $results = $res->fetch_array(MYSQLI_BOTH);
 
@@ -110,116 +110,82 @@ if (isset($_GET["info_hash"])) {
     else {
         block_begin(EDIT_TORRENT);
 
-        if (!user::$current || (user::$current["edit_torrents"] == "no" && user::$current["uid"] != $results["uploader"])) {
+        if (!user::$current || (user::$current['edit_torrents'] == 'no' && user::$current['uid'] != $results['uploader'])) {
             err_msg(ERROR, CANT_EDIT_TORR);
             block_end();
             stdfoot();
             exit();
         }
-        ?>
-        
-        <div align='center'>
-        <form action='<?php echo $scriptname . '?returnto=' . $link; ?>' method='post' name='edit'>
-        <table class='lista'>
-        <tr>
-        <td align='right' class='header'><?php echo FILE_NAME; ?>:</td><td class='lista'><input type='text' name='name' value='<?php echo security::html_safe($results["filename"]); ?>' size='60' /></td>
-        </tr>
 
-        <?php if ($GLOBALS['image_link'] == 'yes') { ?>
-        <tr>
-        <td align='right' class='header'>Image Link:</td><td class='lista'><input type='text' name='image' value='<?php echo security::html_safe($results['image']); ?>' size='60' /></td>
-        </tr>
-        <?php } ?>
+        #Vars...
+        $smarty->assign('scriptname', $scriptname);
+        $smarty->assign('link', $link);
+        $smarty->assign('filename', security::html_safe($results['filename']));
+        $smarty->assign('image', security::html_safe($results['image']));
+        $smarty->assign('genre', security::html_safe($results['genre']));
+        $smarty->assign('info_hash', security::html_safe($results['info_hash']));
+        $smarty->assign('description', textbbcode2('edit', 'comment', security::html_safe(unesc($results['comment']))));
+        $smarty->assign('categories', categories2($results['cat_name']));
 
-        <?php if ($GLOBALS['torrent_genre'] == 'yes') { ?>
-        <tr><td align='right' class='header'><?php echo GENRE; ?>:</td><td class='lista'><input type='text' name='genre' value='<?php echo security::html_safe($results['genre']); ?>' size='60' /></td></tr>
-<?php } ?>
+        #If's...
+        $smarty->assign('image_link', ($GLOBALS['image_link'] == 'yes'));
+        $smarty->assign('torrent_genre', ($GLOBALS['torrent_genre'] == 'yes'));
+        $smarty->assign('is_freeleech', (user::$current['edit_torrents'] == 'yes' && $GLOBALS['freeleech'] == 'yes'));
+        $smarty->assign('nuked_requested', ($GLOBALS['nuked_requested'] == 'yes'));
 
-	<tr>
-        <td align='right' class='header'><?php echo INFO_HASH;?>:</td><td class='lista'><?php echo security::html_safe($results["info_hash"]); ?></td>
-        </tr><tr>
-        <td align='right' class='header'><?php echo DESCRIPTION; ?>:</td><td class='lista'><?php textbbcode("edit", "comment", security::html_safe(unesc($results["comment"]))) ?></td>
-        </tr>
-		<tr>
-         
-        <?php
-        echo "<td align='right' class='header'>".CATEGORY_FULL.":</td><td class='lista' align='left'>";
-        
-        categories($results['cat_name']);
-        
-        echo "</td>";
+        #Lang...
+        $smarty->assign('lang_filename', FILE_NAME);
+        $smarty->assign('lang_genre', GENRE);
+        $smarty->assign('lang_infohash', INFO_HASH);
+        $smarty->assign('lang_description', DESCRIPTION);
+        $smarty->assign('lang_category', CATEGORY_FULL);
+        $smarty->assign('lang_requested', TORRENT_REQUESTED);
+        $smarty->assign('lang_yes', YES);
+        $smarty->assign('lang_no', NO);
+        $smarty->assign('lang_nuked', TORRENT_NUKED);
+        $smarty->assign('lang_size', SIZE);
+        $smarty->assign('lang_added', ADDED);
+        $smarty->assign('lang_downloaded', DOWNLOADED);
+        $smarty->assign('lang_peers', PEERS);
+        $smarty->assign('lang_seeders', SEEDERS);
+        $smarty->assign('lang_leechers', LEECHERS);
+        $smarty->assign('lang_confirm', FRM_CONFIRM);
+        $smarty->assign('lang_cancel', FRM_CANCEL);
 
-        if ($GLOBALS['nuked_requested'] == 'yes') {
-            if ($results['requested'] == 'true') {
-                $selected = " selected='selected'";
-            } else {
-                $selected = '';
-            }
-
-            print("<tr><td class='header' align='right'>" . TORRENT_REQUESTED . ":</td><td class='lista' align='left'>");
-            print("<select name='request' size='1'>");
-            print("<option value='false'" . $selected . ">" . NO . "</option>");
-            print("<option value='true'" . $selected . ">" . YES . "</option>");
-            print("</select></td></tr>");
-
-            if ($results['nuked'] == 'true') {
-                $selected = " selected='selected'";
-            } else {
-                $selected = '';
-            }
-
-            print("<tr><td class='header' align='right'>" . TORRENT_NUKED . ":</td><td class='lista' align='left'>");
-            print("<select name='nuke' size='1'>");
-            print("<option value='false'" . $selected . ">" . NO . "</option>");
-            print("<option value='true'" . $selected . ">" . YES . "</option>");
-            print("</select>&nbsp;<input type='text' name='nuked_reason' value='" . security::html_safe($results['nuke_reason']) . "' size='43' maxlength='100'></td></tr>");
+        if ($results['requested'] == 'true') {
+            $selected = " selected='selected'";
+        } else {
+            $selected = '';
         }
+        $smarty->assign('selectedr', $selected);
+
+        if ($results['nuked'] == 'true') {
+            $selected = " selected='selected'";
+        } else {
+            $selected = '';
+        }
+        $smarty->assign('selectedn', $selected);
+        $smarty->assign('nuked_reason', security::html_safe($results['nuke_reason']));
 
         //Golden Torrents by CobraCRK
-        if (user::$current['edit_torrents'] == 'yes' && $GLOBALS['freeleech'] == 'yes') {
-            if ($results['free'] == 'yes') {
-                $chk = " checked='checked' ";
-            }
-            print("<tr><td class='header'>Freeleech:</td><td class='lista'><input type='checkbox' name='free'" . $chk . " value='1' /> Free download (only upload stats are recorded)</td></tr>");
+        if ($results['free'] == 'yes') {
+            $chk = " checked='checked' ";
         }
+        $smarty->assign('checkedf', $chk);
 		
         include(INCL_PATH . 'offset.php');
-        
-        ?>
-        </tr>
-	<tr>
-        <td align='right' class='header'><?php echo SIZE; ?>:</td><td class='lista'><?php echo misc::makesize((int)$results["size"]); ?></td>
-        </tr>
-	<tr>
-        <td align='right' class='header'><?php echo ADDED; ?>:</td><td class='lista'><?php echo date("d/m/Y H:m:s", $results["data"] - $offset); ?></td>
-        </tr>
-	<tr>
-        <td align='right' class='header'><?php echo DOWNLOADED; ?>:</td><td class='lista'><?php echo (int)$results["finished"] . " " . X_TIMES; ?></td>
-        </tr>
-	<tr>
-        <td align='right' class='header'><?php echo PEERS; ?>:</td><td class='lista'><?php echo SEEDERS .": " . (int)$results["seeds"] . ", " . LEECHERS .": " . (int)$results["leechers"] . " = " . ((int)$results["leechers"] + (int)$results["seeds"]) . " " . PEERS; ?></td>
-        </tr>
-        <tr>
-	<td><input type='hidden' name='info_hash' size='40' value='<?php echo security::html_safe($results["info_hash"]);  ?>'></td><td></td>
-	</tr>
-        <tr>
-	<td align='right'></td>
-        </table>
-        <table>
-	<td align='right'>
-        <input type='submit' value='<?php echo FRM_CONFIRM; ?>' name='action' />
-        </td>
-        <td>
-        <input type='submit' value='<?php echo FRM_CANCEL; ?>' name='action' /></td>
-        </form>
-        </table>
-        </tr>
-        </div>
-        
-        <?php
+
+        $smarty->assign('size', misc::makesize((int)$results['size']));
+        $smarty->assign('added', date('d/m/Y H:m:s', $results['data'] - $offset));
+        $smarty->assign('downloaded', (int)$results['finished'] . ' ' . X_TIMES);
+        $smarty->assign('seeders', (int)$results['seeds']);
+        $smarty->assign('leechers', (int)$results['leechers']);
+        $smarty->assign('peers', ((int)$results['leechers'] + (int)$results['seeds']));
+
+        $smarty->display($STYLEPATH . '/tpl/torrent/edit.tpl');
     }
 
-block_end();
+    block_end();
 }
 
 stdfoot();
