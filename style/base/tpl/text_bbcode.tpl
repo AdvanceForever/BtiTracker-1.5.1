@@ -154,7 +154,7 @@
 			obj.focus();
 	}
 	</script>
-<table cellpadding="5" cellspacing="0" align="center"  border="1" class="bb_holder">
+<table cellpadding="5" cellspacing="0" align="left"  border="1" class="bb_holder">
   <tr>
     <td width="100%" style="padding:0" colspan="2">
     <div style="float:left;padding:4px 0px 0px 2px;"> 
