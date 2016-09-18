@@ -29,37 +29,30 @@ if ($do == 'comments' && $action == 'edit') {
     $id = (int)$_GET['id'];
 
     $subres = $db->query("SELECT * FROM comments WHERE id = '" . $id . "' ORDER BY added DESC");
+
     if ($subrow = $subres->fetch_array(MYSQLI_BOTH)) {
-	if ($subrow['user'] == user::$current['username'] || user::$current['mod_access'] == 'yes' || user::$current['edit_forum'] == 'yes' || user::$current['delete_torrents'] == 'yes') {
+	    if ($subrow['user'] == user::$current['username'] || user::$current['mod_access'] == 'yes' || user::$current['edit_forum'] == 'yes' || user::$current['delete_torrents'] == 'yes') {
             block_begin(EDIT);
-            ?>
-            <form name='commentsedit' method='post' action="edit_comment.php?do=comments&action=write&id=<?php echo (int)$subrow['id']; ?>"multipart/form-data">
-            <input type='hidden' name='info_hash' value='<?php echo security::html_safe($subrow['info_hash']); ?>' />
-	    <table class='lista' width='100%' align='center'>
-            <tr>
-            <td class='header' align='right'><?php echo USER_NAME; ?></td>
-            <td class='lista'><input type='text' name='user' value='<?php echo security::html_safe($subrow['user']); ?>' size='40' maxlength='60' disabled; readonly /></td>
-            </tr>
-            <?php
-            print("<tr><td class='header' align='right'>" . COMMENT_1 . "</td><td class='lista' align='left' style='padding: 0px'>");
-            textbbcode('commentsedit', 'text', security::html_safe(unesc($subrow['text'])));
-            print("</td></tr>");
-            ?>
-            <tr>
-            <td class='lista' colspan='2' align='center'><input type='submit' name='write' value='<?php echo FRM_CONFIRM ?>' />&nbsp;&nbsp;&nbsp;
-            <input type='submit' name='write' value='<?php echo FRM_CANCEL ?>' /></td>
-            </tr>
-            </table>
-            </form>
-            <?php
+
+            $smarty->assign('id', (int)$subrow['id']);
+            $smarty->assign('info_hash', security::html_safe($subrow['info_hash']));
+            $smarty->assign('username', security::html_safe($subrow['user']));
+            $smarty->assign('comment', textbbcode2('commentsedit', 'text', security::html_safe(unesc($subrow['text']))));
+
+            $smarty->assign('lang_username', USER_NAME);
+            $smarty->assign('lang_comment', COMMENT_1);
+            $smarty->assign('lang_confirm', FRM_CONFIRM);
+            $smarty->assign('lang_cancel', FRM_CANCEL);
+
+            $smarty->display($STYLEPATH . '/tpl/torrent/edit_comment.tpl');
+
             block_end();
-            print("<br />");
-	} else {
-	    block_begin('Access Denied !');
-	    err_msg(ERROR, 'You do not have permission to access this page !');
-	    block_end();
-	    stdfoot();
-	    exit();
+	    } else {
+	        block_begin('Access Denied !');
+	        err_msg(ERROR, 'You do not have permission to access this page !');
+	        block_end();
+	        stdfoot();
+	        exit();
         }		
     }			   
 } elseif ($do == 'comments' && $action == 'quote') {
@@ -67,35 +60,28 @@ if ($do == 'comments' && $action == 'edit') {
     $quote = (int)$_GET['id'];
 
     $subres = $db->query("SELECT * FROM comments WHERE id = '" . $id . "' ORDER BY added DESC");
+
     if ($subrow = $subres->fetch_array(MYSQLI_BOTH)) {			
         block_begin(QUOTE);
-        ?>
-        <form name='comment' method='post' action="edit_comment.php?do=comments&action=confirm&id=<?php echo (int)$subrow['id']; ?>"multipart/form-data">
-        <input type='hidden' name='info_hash' value='<?php echo security::html_safe($subrow['info_hash']); ?>' />				   
-	<table class='lista' width='100%' align='center'>
-        <tr>
-        <td class='header' align='right'><?php echo USER_NAME; ?></td>
-        <td class='lista'><input type='text' name='user' value='<?php echo user::$current['username']; ?>' size='40' maxlength='60' disabled; readonly /></td>
-        </tr>
-        <?php
-        print("<tr><td class='header' align='right'>" . COMMENT_1 . "</td><td class='lista' align='left' style='padding: 0px'>");
-	textbbcode('comment', 'text', ($quote ? (('[quote=' . security::html_safe($subrow['user']) . ']' . security::html_safe(unesc($subrow['text'])) . '[/quote]')) : ''));
-        print("</td></tr>");
-        ?>
-        <tr>
-        <td class='lista' colspan='2' align='center'><input type='submit' name='confirm' value='<?php echo FRM_CONFIRM ?>' />&nbsp;&nbsp;&nbsp;
-        <input type='submit' name='confirm' value='<?php echo FRM_CANCEL ?>' /></td>
-        </tr>
-        </table>
-        </form>
-        <?php
+
+        $smarty->assign('quote_id', (int)$subrow['id']);
+        $smarty->assign('quote_info_hash', security::html_safe($subrow['info_hash']));
+        $smarty->assign('quote_username', user::$current['username']);
+        $smarty->assign('quote_comment', textbbcode2('comment', 'text', ($quote ? (('[quote=' . security::html_safe($subrow['user']) . ']' . security::html_safe(unesc($subrow['text'])) . '[/quote]')) : '')));
+
+        $smarty->assign('langq_username', USER_NAME);
+        $smarty->assign('langq_comment', COMMENT_1);
+        $smarty->assign('langq_confirm', FRM_CONFIRM);
+        $smarty->assign('langq_cancel', FRM_CANCEL);
+
+        $smarty->display($STYLEPATH . '/tpl/torrent/quote_comment.tpl');
+
         block_end();
-        print('<br />');
     }
 } elseif ($do == 'comments' && $action == 'write') {
     if ($_POST['write'] == FRM_CONFIRM) {
         $id = intval($_GET['id']);
-	$text = sqlesc($_POST['text']);
+        $text = sqlesc($_POST['text']);
 
         $db->query("UPDATE comments SET text = " . $text . ", editedby = " . user::$current['uid'] . ", editedat = UNIX_TIMESTAMP() WHERE id = " . $id) or sqlerr();
 
@@ -117,9 +103,9 @@ if ($do == 'comments' && $action == 'edit') {
 
         @$db->query("INSERT INTO comments (added, text, ori_text, user, info_hash) VALUES (NOW(), '" . $comment . "', '" . $comment . "', '" . $user . "', '" . $db->real_escape_string(StripSlashes($_POST['info_hash'])) . "')");
 
-        redirect('details.php?id=' . StripSlashes($_POST['info_hash']) . '#comments');
+        redirect('details.php?id=' . stripslashes($_POST['info_hash']) . '#comments');
     } else
-    redirect('details.php?id=' . StripSlashes($_POST['info_hash']) . '#comments');
+        redirect('details.php?id=' . stripslashes($_POST['info_hash']) . '#comments');
 }
 
 stdfoot();
