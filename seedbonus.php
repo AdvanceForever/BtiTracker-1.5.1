@@ -1,70 +1,58 @@
 <?php
+/*
+ * BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
+ * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
+ * Updated and Maintained by Yupy.
+ * Copyright (C) 2004-2015 Btiteam.org
+ */
 // SeedBonus Mod by CobraCRK   -   original ideea by TvRecall...
-//cobracrk[at]yahoo.com
-//www.extremeshare.org
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
 
 dbconn();
 
 standardheader('Seed Bonus');
 
-if (user::$current["view_torrents"] == "no") {
+if (user::$current['view_torrents'] == 'no') {
     err_msg(ERROR, NOT_AUTH_VIEW_NEWS);
     stdfoot();
     exit;
 } else {
-    block_begin("Seed Bonus");
+    block_begin('Seed Bonus');
 	
-    print("<style type='text/css'>
-    <!--
-    .style1 {
-	color: #000000;
-	font-size: x-large;
-    }
-    .style2 {font-size: x-large}
-    -->
-    </style>");
+    $r = $db->query('SELECT seedbonus FROM users WHERE id = ' . user::$current['uid']);
+    $cc = mysqli_result($r, 0, 'seedbonus');
 
-    print("<p align='center'>");
-	
-    $r = $db->query("SELECT seedbonus FROM users WHERE id = " . user::$current['uid']);
-    $cc = mysqli_result($r, 0, "seedbonus");
-	
-    print("<br><center><h1>" . BONUS_INFO1 . " " . $cc . ").<br />" . BONUS_INFO2 . "</h1></center>");
+    $smarty->assign('language_info1', BONUS_INFO1);
+    $smarty->assign('language_info2', BONUS_INFO2);
+    $smarty->assign('language_option', OPTION);
+    $smarty->assign('language_about', WHAT_ABOUT);
+    $smarty->assign('language_points', POINTS);
+    $smarty->assign('language_exchange', EXCHANGE);
+    $smarty->assign('language_desc', BONUS_DESC);
+    $smarty->assign('language_info3', BONUS_INFO3);
 
-    print("</p>
-        <p>&nbsp;</p>
-        <table width='474' border='1' align='center' cellpadding='2' cellspacing='0'>
-        <tr>
-            <td width='26'>" . OPTION . "</td>
-            <td width='319'>" . WHAT_ABOUT . "</td>
-            <td width='41'>" . POINTS . "</td>
-            <td width='62'>" . EXCHANGE . "</td>
-        </tr>");
+    $smarty->assign('points_cc', $cc);
 	
     $uid = user::$current['uid'];
-    $r = $db->query("SELECT * FROM users WHERE id = " . $uid);
-    $c = mysqli_result($r, 0, "seedbonus");
+    $r = $db->query('SELECT * FROM users WHERE id = ' . $uid);
+    $c = mysqli_result($r, 0, 'seedbonus');
+
+    $smarty->assign('c', $c);
 	
-    $r = $db->query("SELECT * FROM bonus");
+    $r = $db->query('SELECT * FROM bonus');
     while ($row = $r->fetch_array(MYSQLI_BOTH)) {
-        if ($c < $row['points']) {
-		    $enb = "disabled";
-		}
-		
-        print("<form action='seedbonus_exchange.php?id=" . (int)$row['id'] . "' method='post'>
-		    <tr>
-                <td><h1><center>" . security::html_safe($row['name']) . "</center></h1></td>
-                <td><b>" . (int)$row['gb'] . " GB Upload</b><br />" . BONUS_DESC . "</td>
-                <td>" . (int)$row['points'] . "</td>
-                <td><input type='submit' name='submit' value='" . EXCHANGE . "!' " . $enb . "></td>
-            </tr>
-			</form>");
+           $row['id'] = (int)$row['id'];
+           $row['name'] = security::html_safe($row['name']);
+           $row['gb'] = (int)$row['gb'];
+           $row['points'] = (int)$row['points'];
+
+           $seedbonus[] = $row;
     }
+    $smarty->assign('show_seedbonus', $seedbonus);
+    unset($seedbonus);
 	
-    print("</table>
-        <p align='center' class='style1'>&nbsp;</p>
-        <p class='style2'><center><h1> " .BONUS_INFO3 . "</h1></center></p>");
+    $smarty->display($STYLEPATH . '/tpl/tracker/seedbonus.tpl');
+
     block_end();
 }
 
