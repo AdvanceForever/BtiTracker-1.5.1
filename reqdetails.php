@@ -41,7 +41,7 @@ if (user::$current['uid'] == $num['userid'] || user::$current['edit_torrents'] =
 
 print("</td></tr>");
 
-if ($num['desc']) {
+if (!$num['desc']) {
     print("<tr><td align='left' class='header'>" . INFO . ":</td><td class='lista' width='70%' align='left'>" . format_comment(unesc($num['descr'])) . "</td></tr>");
 }
 print("<tr><td align='left' class='header'>" . ADDED  . ":</td><td class='lista' width='70%' align='left'>" . unesc($num['added']) . "</td></tr>");
