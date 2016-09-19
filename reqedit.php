@@ -26,11 +26,7 @@ if (user::$current['uid'] == $row['userid'] || user::$current['edit_torrents'] =
     $res2 = $db->query("SELECT * FROM requests " . $where) or sqlerr();
     $num2 = $res2->num_rows;
 
-    print("<form name='edit' method='post' action='takereqedit.php'><a name='edit' id='edit'></a>");
-    print("<table class='lista' align='center' width='550' cellspacing='2' cellpadding='0'>\n");
-    print("<br><tr><td align='left' class='header'>". TORRENT_FILE ."</td><td class='lista' align='left'><input type='text' size='60' name='requesttitle' value='" . security::html_safe($row['request']) . "'></td></tr>");
-
-    print("<tr><td align='center' class='header'>Category:</td><td align='left' class='lista'>\n");
+    $smarty->assign('request', security::html_safe($row['request']));
 
     $s = "<select name='category'>\n";
 
@@ -43,22 +39,21 @@ if (user::$current['uid'] == $row['userid'] || user::$current['edit_torrents'] =
     }
 
     $s .= "</select>\n";
-    print($s . "</td></tr>\n");
 
-    print("<tr><td align='left' class='header'>" . DESCRIPTION . "</td><td align='left' class='lista'>");
-    print(textbbcode('edit', 'description', unesc($row['descr'])));
-    print("</td></tr>");
-    print("<input type='hidden' name='id' value='" . $id2 . "'>\n");
-    print("<tr><td colspan='2' align='center' class='lista'><input type='submit' value='Submit'>\n");
-    print("</form>\n");
-    print("</table>\n");
+    $smarty->assign('category', $s);
+    $smarty->assign('description', textbbcode2('edit', 'description', unesc($row['descr'])));
+    $smarty->assign('id2', $id2);
+
+    $smarty->assign('lang_torrent_file', TORRENT_FILE);
+    $smarty->assign('lang_description', DESCRIPTION);
+
+    $smarty->display($STYLEPATH . '/tpl/tracker/request_edit.tpl');
 
     block_end();
     stdfoot();
 } else {
     block_begin("You're not the owner!");
     err_msg(ERROR, 'Or you are not authorized or this is a bug, report it pls...');
-    print("<br />");
     block_end();
     stdfoot();
     exit;
