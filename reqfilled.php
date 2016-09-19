@@ -14,9 +14,7 @@ standardheader('Fill Request');
 if (user::$current['can_upload'] == 'no') {
     // do nothing
 } else {
-   begin_frame(REQUEST_FILLED);
- 
-   print("<table align='center' width='550' class='lista'><tr><td class='lista' align='center' width='100%'>");
+   begin_frame('Request Filled !');
 
    $filledurl = $db->real_escape_string($_GET['filledurl']);
    $requestid = (int)$_GET['requestid'];
@@ -44,12 +42,13 @@ if (user::$current['can_upload'] == 'no') {
 
    $db->query("INSERT INTO messages (sender, receiver, added, subject, msg) VALUES(" . user::$current['uid'] . ", " . (int)$arr['userid'] . ", UNIX_TIMESTAMP(), " . sqlesc($subject) . ", " . sqlesc($msg) . ")") or sqlerr(__FILE__, __LINE__);
 
-   print("<table class='lista' align='center' width='550' cellspacing='2' cellpadding='0'>\n");
-   print("<br><br><div align='left'>".REQUEST." " . security::html_safe($arr['request']) . " has now been successfuly filled with: <a href='" . $filledurl . "'>" . $filledurl . "</a>.  User <a href='userdetails.php?id=" . (int)$arr['userid'] . "'><b>" . security::html_safe($arr['username']) . "</b></a> has automaticly PM'ed upon upload.<br>
-<br><b>Oh, this is an accident?</b><br><br>No worries, only <a href=reqreset.php?requestid=" . $requestid . "><b>CLICK HERE</b></a> to reset this request.<br><b>Note:</b> do not click unless that is what you want to do.<br><br></div>");
-   print("<br><br>Thanks for filling out this request :)<br><br>Go back to<a href='viewrequests.php'><b> Requests</b></a>");
-   print("</td></tr></table>");
+   $smarty->assign('request', security::html_safe($arr['request']));
+   $smarty->assign('filled_url', $filledurl);
+   $smarty->assign('userid', (int)$arr['userid']);
+   $smarty->assign('username', security::html_safe($arr['username']));
+   $smarty->assign('request_id', $requestid);
 
+   $smarty->display($STYLEPATH . '/tpl/tracker/request_filled.tpl');
 }
 
 block_end();
