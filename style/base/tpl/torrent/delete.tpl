@@ -48,7 +48,7 @@
    <td class='lista'>{$lang.seeders}: {$seeders}, {$lang.leechers}: {$leechers} = {$peers} {$lang.peers}</td>
 </tr>
 </table>
-<form action='{$scriptname}?info_hash={$id}&returnto={$link}' name='delete' method='post'>
+<form action='{$scriptname}?info_hash={$id}&amp;returnto={$link}' name='delete' method='post'>
 <center>
    <input type='submit' name='action' value='{$lang.delete}' />&nbsp;&nbsp;<input type='submit' name='action' value='{$lang.cancel}' />
 </center>
