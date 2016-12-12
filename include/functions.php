@@ -333,14 +333,14 @@ function isFreeLock($lock) {
 // only person connected.
 function evilReject($ip, $peer_id, $port) {
     // For those of you who are feeling evil, comment out this line.
-    showError("Torrent is not authorized for use on this tracker.");
+    showError('Torrent is not authorized for use on this tracker.');
     
-    $peers[0]["peer_id"]        = $peer_id;
-    $peers[0]["ip"]             = $ip;
-    $peers[0]["port"]           = $port;
-    $peers["size"]              = 1;
-    $GLOBALS["report_interval"] = 86400;
-    $GLOBALS["min_interval"]    = 86000;
+    $peers[0]['peer_id']        = $peer_id;
+    $peers[0]['ip']             = $ip;
+    $peers[0]['port']           = $port;
+    $peers['size']              = 1;
+    $GLOBALS['report_interval'] = 86400;
+    $GLOBALS['min_interval']    = 86000;
     sendPeerList($peers);
     exit(0);
 }
@@ -362,7 +362,7 @@ function mksecret($len = 20) {
 }
 
 function hashit($var, $addtext = '') {
-    return md5("R8rYxEX7" . $addtext . $var . $addtext . "Ystkyi6xSRYOTKJU3AmJ1D2");
+    return md5('R8rYxEX7' . $addtext . $var . $addtext . 'Ystkyi6xSRYOTKJU3AmJ1D2');
 }
 
 function logincookie($id, $passhash, $expires = 0x7fffffff) {
@@ -576,42 +576,45 @@ function sqlesc($x) {
 }
 
 function print_news($limit = 0) {
-    global $db, $limitqry, $adm_menu, $CURRENTPATH;
+    global $db, $limitqry, $adm_menu, $CURRENTPATH, $STYLEPATH, $smarty;
 	
     $output = '';
     
     $model = "<table cellpadding='4' cellspacing='1' border='0' width='100%' bgcolor='#000000' style='font-family:Verdana;font-size:11px'>" . "\n{admin_menu}" . "\n<tr><td class='header' align='center'>" . POSTED_BY . ": {user_name}" . "\n<br>" . POSTED_DATE . ": {news_date}" . "\n</td></tr><tr><td class='lista' align='center'>" . "\n<b>" . TITLE . ": {news_title}</b><br><br>" . "\n<table style='border-top:1px' solid gray;width:100%;font-family:Verdana;font-size:10px'>" . "\n<tr><td>{news}</td></tr>" . "\n</table></td></tr></table><br>";
     
     if ($limit > 0)
-        $limitqry = "LIMIT " . $limit;
+        $limitqry = 'LIMIT ' . $limit;
 	
-    $res = $db->query("SELECT news.id, news.title, news.news,UNIX_TIMESTAMP(news.date) AS news_date, users.username FROM news INNER JOIN users ON users.id = news.user_id ORDER BY date DESC " . $limitqry);
+    $res = $db->query('SELECT news.id, news.title, news.news,UNIX_TIMESTAMP(news.date) AS news_date, users.username FROM news INNER JOIN users ON users.id = news.user_id ORDER BY date DESC ' . $limitqry);
 
     while ($rows = $res->fetch_array(MYSQLI_BOTH)) {
-        if (user::$current["edit_news"] == "yes" || user::$current["delete_news"] == "yes")
+        if (user::$current['edit_news'] == 'yes' || user::$current['delete_news'] == 'yes')
             $adm_menu = "<tr><td class='header' align='center'>";
-        if (user::$current["edit_news"] == "yes")
+        if (user::$current['edit_news'] == 'yes')
             $adm_menu .= "<a href='news.php'>" . ADD . "</a>&nbsp;&nbsp;&nbsp;<a href='news.php?act=edit&id=" . (int)$rows["id"] . "'>" . EDIT . "</a>";
-        if (user::$current["delete_news"] == "yes")
-            $adm_menu .= "&nbsp;&nbsp;&nbsp;<a onclick='return confirm('" . str_replace("'", "\'", DELETE_CONFIRM) . "')' href='news.php?act=del&id=" . (int)$rows["id"] . "'>" . DELETE . "</a></td></tr>";
+        if (user::$current['delete_news'] == 'yes')
+            $adm_menu .= "&nbsp;&nbsp;&nbsp;<a onclick='return confirm('" . str_replace("'", "\'", DELETE_CONFIRM) . "')' href='news.php?act=del&amp;id=" . (int)$rows['id'] . "'>" . DELETE . "</a></td></tr>";
         else
             $adm_menu .= '';
         
         include(INCL_PATH . 'offset.php');
-        $news   = format_comment($rows["news"]);
-        $output = preg_replace("/{user_name}/", security::html_safe(unesc($rows["username"])), $model);
-        $output = preg_replace("/{admin_menu}/", $adm_menu, $output);
-        $output = preg_replace("/{news_date}/", date("d/m/Y H:i", $rows["news_date"] - $offset), $output);
-        $output = preg_replace("/{news_title}/", security::html_safe(unesc($rows["title"])), $output);
-        $output = preg_replace("/{news}/", $news, $output);
+        $news   = format_comment(unesc($rows['news']));
+        $output = preg_replace('/{user_name}/', security::html_safe(unesc($rows['username'])), $model);
+        $output = preg_replace('/{admin_menu}/', $adm_menu, $output);
+        $output = preg_replace('/{news_date}/', date('d/m/Y H:i', unesc($rows['news_date']) - $offset), $output);
+        $output = preg_replace('/{news_title}/', security::html_safe(unesc($rows['title'])), $output);
+        $output = preg_replace('/{news}/', $news, $output);
         print $output;
     }
+
+    $smarty->assign('lang_no_news', NO_NEWS);
+    $smarty->assign('lang_add', ADD);
+
+    #If's...
+    $smarty->assign('has_output', ($output == ''));
+    $smarty->assign('can_edit_news', (user::$current['edit_news'] == 'yes'));
 	
-    if ($output == '') {
-        print("<center>" . NO_NEWS . "...<br />");
-        if (user::$current["edit_news"] == "yes")
-            print("<br /><a href='news.php'><img border='0' alt='" . ADD . "' src='images/new.gif'></a><br /></center>");
-    }
+    $smarty->display($STYLEPATH . '/tpl/tracker/no_news.tpl');
 }
 
 function print_users() {
@@ -941,6 +944,5 @@ function Warn_disabled($iduser) {
 	return $warned . "" . $disabled;
 }
 //User Warning System Hack Stop
-
 
 ?>
