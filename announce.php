@@ -893,7 +893,7 @@ if ($GLOBALS["countbytes"]) {
     if ($results === MCached::NO_RESULT) {
         $query = @$db->query("SELECT UNIX_TIMESTAMP() - lastSpeedCycle FROM summary WHERE info_hash = '" . $info_hash . "'");
         $results = $query->fetch_row();
-        MCached::add('count::bytes::' . $info_hash, $results, 300);
+        MCached::add('ann:count::bytes::' . $info_hash, $results, 300);
     }
 
     if ($results[0] >= 60)
