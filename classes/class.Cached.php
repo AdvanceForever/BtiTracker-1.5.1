@@ -21,7 +21,7 @@ class Cached {
 	   $key = 'banned::' . $ip;
 	   $banned = MCached::get($key);
            if ($banned === MCached::NO_RESULT) {
-                $res = $db->query("SELECT comment FROM bannedip WHERE '" . $nip . "' >= first AND '" . $nip . "' <= last");
+                $res = $db->query("SELECT comment FROM bannedip WHERE INET_ATON('" . $nip . "') >= first AND INET_ATON('" . $nip . "') <= last");
                 
                 if ($res->num_rows) {
                      $comment = $res->fetch_row();
