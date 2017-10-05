@@ -594,7 +594,7 @@ function aggiungiutente() {
         exit;
     }
     
-    @$db->query("INSERT INTO users (username, password, random, id_level, email, style, language, flag, joined, lastconnect, pid, time_offset) VALUES ('" . $utente . "', '" . md5($pwd) . "', " . $random . ", " . $idlevel . ", '" . $email . "', " . $idstyle . ", " . $idlangue . ", " . $idflag . ", NOW(), NOW(), '" . md5(uniqid(mt_rand(), true)) . "', '" . $timezone . "')") or sqlerr(__FILE__, __LINE__);
+    @$db->query("INSERT INTO users (username, password, random, id_level, email, style, language, flag, joined, lastconnect, disabledon, timed_rank, pid, time_offset) VALUES ('" . $utente . "', '" . md5($pwd) . "', " . $random . ", " . $idlevel . ", '" . $email . "', " . $idstyle . ", " . $idlangue . ", " . $idflag . ", NOW(), NOW(), NOW(), NOW(), '" . md5(uniqid(mt_rand(), true)) . "', '" . $timezone . "')") or sqlerr(__FILE__, __LINE__);
     
     MCached::del('latest::member');
 
