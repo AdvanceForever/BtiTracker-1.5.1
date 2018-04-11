@@ -18,8 +18,8 @@
 #         This version was made for BtitTracker        #
 ########################################################
 */
-require_once('classes/class.Vars.php');
-require_once('classes/class.User.php');
+require_once('include/classes/class.Vars.php');
+require_once('include/classes/class.User.php');
 
 function crk($l) {
     global $BASEURL;
