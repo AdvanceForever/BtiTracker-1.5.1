@@ -1,11 +1,11 @@
-<script type="text/javascript">
+<?php if(!class_exists('raintpl')){exit;}?><script type="text/javascript">
 	function wrap(v,r,e)
 	{
 		var r = r ? r : "";
 		var v = v ? v : "";
 		var e = e ? e : "";
 		
-		var obj = document.getElementById("{$text}");
+		var obj = document.getElementById("<?php echo $text;?>");
 		
 		if (document.selection)
 		{
@@ -70,7 +70,7 @@
 	}
 	function text(to)
 	{
-		var obj = document.getElementById("{$text}");
+		var obj = document.getElementById("<?php echo $text;?>");
 		
 		if (document.selection)
 		{
@@ -93,7 +93,7 @@
 	function fonts(w)
 	{
 		var fmin = 12; var fmax = 24;
-		var obj = document.getElementById("{$text}");
+		var obj = document.getElementById("<?php echo $text;?>");
 		var size = obj.style.fontSize;
 		size = (parseInt(size));
 			var nsize ;
@@ -110,7 +110,7 @@
 		if(w == 'color')
 			f = "#"+f;
 			
-		var obj = document.getElementById("{$text}");
+		var obj = document.getElementById("<?php echo $text;?>");
 		
 		if (document.selection)
 		{
@@ -133,7 +133,7 @@
 	}
 	function em(f)
 	{
-		var obj = document.getElementById("{$text}");
+		var obj = document.getElementById("<?php echo $text;?>");
 		
 		if (document.selection)
 		{
@@ -159,17 +159,17 @@
   <tr>
     <td width="100%" style="padding:0" colspan="2">
     <div style="float:left;padding:4px 0px 0px 2px;"> 
-        <img class="bb_icon" src="images/bbcode/bold.png" onclick="tag('b')" title="Bold" alt="B" /> 
-        <img class="bb_icon" src="images/bbcode/italic.png" onclick="tag('i')" title="Italic" alt="I" /> 
-        <img class="bb_icon" src="images/bbcode/underline.png" onclick="tag('u')" title="Underline" alt="U" /> 
-        <img class="bb_icon" src="images/bbcode/strike.png" onclick="tag('s')" title="Strike" alt="S" /> 
-        <img class="bb_icon" src="images/bbcode/link.png" onclick="clink()" title="Link" alt="Link" /> 
-        <img class="bb_icon" src="images/bbcode/picture.png" onclick="cimage()" title="Add image" alt="Image"/> 
-        <img class="bb_icon" src="images/bbcode/script.png" onclick="tag('code')" title="Add code" alt="Code" />
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/bold.png" onclick="tag('b')" title="Bold" alt="B" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/italic.png" onclick="tag('i')" title="Italic" alt="I" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/underline.png" onclick="tag('u')" title="Underline" alt="U" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/strike.png" onclick="tag('s')" title="Strike" alt="S" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/link.png" onclick="clink()" title="Link" alt="Link" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/picture.png" onclick="cimage()" title="Add image" alt="Image"/> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/script.png" onclick="tag('code')" title="Add code" alt="Code" />
    </div>
       <div style="float:right;padding:4px 2px 0px 0px;"> 
-      	<img class="bb_icon" src="images/bbcode/align_center.png" onclick="wrap('align','','center')" title="Align - center" alt="Center" /> 		        <img class="bb_icon" src="images/bbcode/align_left.png" onclick="wrap('align','','left')" title="Align - left" alt="Left" /> 
-        <img class="bb_icon" src="images/bbcode/align_justify.png" onclick="wrap('align','','justify')" title="Align - justify" alt="justify" /> 		<img class="bb_icon" src="images/bbcode/align_right.png" onclick="wrap('align','','right')" title="Align - right" alt="Right" /> 
+      	<img class="bb_icon" src="./style/base/tpl/images/bbcode/align_center.png" onclick="wrap('align','','center')" title="Align - center" alt="Center" /> 		        <img class="bb_icon" src="./style/base/tpl/images/bbcode/align_left.png" onclick="wrap('align','','left')" title="Align - left" alt="Left" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/align_justify.png" onclick="wrap('align','','justify')" title="Align - justify" alt="justify" /> 		<img class="bb_icon" src="./style/base/tpl/images/bbcode/align_right.png" onclick="wrap('align','','right')" title="Align - right" alt="Right" /> 
       </div>
      </td>
   </tr>
@@ -223,57 +223,57 @@
         
     </div>
       <div style="float:right;padding:4px 2px 0px 0px;"> 
-      	<img class="bb_icon" src="images/bbcode/text_uppercase.png" onclick="text('up')" title="To Uppercase" alt="Up" /> 
-        <img class="bb_icon" src="images/bbcode/text_lowercase.png" onclick="text('low')" title="To Lowercase" alt="Low" /> 
-        <img class="bb_icon" src="images/bbcode/zoom_in.png" onclick="fonts('up')" title="Font size up" alt="S up" /> 
-        <img class="bb_icon" src="images/bbcode/zoom_out.png" onclick="fonts('down')" title="Font size up" alt="S down" />
+      	<img class="bb_icon" src="./style/base/tpl/images/bbcode/text_uppercase.png" onclick="text('up')" title="To Uppercase" alt="Up" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/text_lowercase.png" onclick="text('low')" title="To Lowercase" alt="Low" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/zoom_in.png" onclick="fonts('up')" title="Font size up" alt="S up" /> 
+        <img class="bb_icon" src="./style/base/tpl/images/bbcode/zoom_out.png" onclick="fonts('down')" title="Font size up" alt="S down" />
      </div></td>
   </tr>
   <tr>
-    <td><textarea id="{$text}" name="{$text}" style="width:400px;height:250px;font-size:12px;">{$content}</textarea></td>
+    <td><textarea id="<?php echo $text;?>" name="<?php echo $text;?>" style="width:400px;height:250px;font-size:12px;"><?php echo $content;?></textarea></td>
     <td align="center" valign="top">
    <table width="0" cellpadding="2" border="1" class="em_holder" cellspacing="2">
    <tr>
-      <td align="center"><a href="javascript:em(':)');"><img border="0" src="images/smilies/smile.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':D');"><img border="0" src="images/smilies/smilegrin.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':angel:');"><img border="0" src="images/smilies/angel.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':angry:');"><img border="0" src="images/smilies/angry.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':)');"><img border="0" src="./style/base/tpl/images/smilies/smile.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':D');"><img border="0" src="./style/base/tpl/images/smilies/smilegrin.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':angel:');"><img border="0" src="./style/base/tpl/images/smilies/angel.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':angry:');"><img border="0" src="./style/base/tpl/images/smilies/angry.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':confused:');"><img border="0" src="images/smilies/confused.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':crying:');"><img border="0" src="images/smilies/crying.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':hugleft:');"><img border="0" src="images/smilies/hugleft.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':clown:');"><img border="0" src="images/smilies/clown.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':confused:');"><img border="0" src="./style/base/tpl/images/smilies/confused.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':crying:');"><img border="0" src="./style/base/tpl/images/smilies/crying.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':hugleft:');"><img border="0" src="./style/base/tpl/images/smilies/hugleft.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':clown:');"><img border="0" src="./style/base/tpl/images/smilies/clown.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':cool:');"><img border="0" src="images/smilies/cool.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':devilish:');"><img border="0" src="images/smilies/devilish.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':embarrassed:');"><img border="0" src="images/smilies/embarrassed.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':glasses:');"><img border="0" src="images/smilies/glasses.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':cool:');"><img border="0" src="./style/base/tpl/images/smilies/cool.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':devilish:');"><img border="0" src="./style/base/tpl/images/smilies/devilish.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':embarrassed:');"><img border="0" src="./style/base/tpl/images/smilies/embarrassed.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':glasses:');"><img border="0" src="./style/base/tpl/images/smilies/glasses.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':hugright:');"><img border="0" src="images/smilies/hugright.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':kiss:');"><img border="0" src="images/smilies/kiss.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':lol:');"><img border="0" src="images/smilies/laughing.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':love:');"><img border="0" src="images/smilies/love.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':hugright:');"><img border="0" src="./style/base/tpl/images/smilies/hugright.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':kiss:');"><img border="0" src="./style/base/tpl/images/smilies/kiss.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':lol:');"><img border="0" src="./style/base/tpl/images/smilies/laughing.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':love:');"><img border="0" src="./style/base/tpl/images/smilies/love.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':martini:');"><img border="0" src="images/smilies/martini.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':ninja:');"><img border="0" src="images/smilies/ninja.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':pirate:');"><img border="0" src="images/smilies/pirate.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':plain:');"><img border="0" src="images/smilies/plain.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':martini:');"><img border="0" src="./style/base/tpl/images/smilies/martini.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':ninja:');"><img border="0" src="./style/base/tpl/images/smilies/ninja.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':pirate:');"><img border="0" src="./style/base/tpl/images/smilies/pirate.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':plain:');"><img border="0" src="./style/base/tpl/images/smilies/plain.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':quiet:');"><img border="0" src="images/smilies/quiet.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':raspberry:');"><img border="0" src="images/smilies/raspberry.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':sad:');"><img border="0" src="images/smilies/sad.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':sick:');"><img border="0" src="images/smilies/sick.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':quiet:');"><img border="0" src="./style/base/tpl/images/smilies/quiet.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':raspberry:');"><img border="0" src="./style/base/tpl/images/smilies/raspberry.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':sad:');"><img border="0" src="./style/base/tpl/images/smilies/sad.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':sick:');"><img border="0" src="./style/base/tpl/images/smilies/sick.svg" /></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="javascript:em(':sleeping:');"><img border="0" src="images/smilies/sleeping.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':smilebig:');"><img border="0" src="images/smilies/smilebig.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':smirk:');"><img border="0" src="images/smilies/smirk.svg" /></a></td>
-      <td align="center"><a href="javascript:em(':surprise:');"><img border="0" src="images/smilies/surprise.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':sleeping:');"><img border="0" src="./style/base/tpl/images/smilies/sleeping.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':smilebig:');"><img border="0" src="./style/base/tpl/images/smilies/smilebig.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':smirk:');"><img border="0" src="./style/base/tpl/images/smilies/smirk.svg" /></a></td>
+      <td align="center"><a href="javascript:em(':surprise:');"><img border="0" src="./style/base/tpl/images/smilies/surprise.svg" /></a></td>
     </tr>
 	</table>
 	</td>

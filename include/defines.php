@@ -43,7 +43,7 @@ if (preg_match('/(?:\< *(?:java|script)|script\:|\+document\.)/i', serialize($_C
 #Define Directories...
 define('INCL_PATH', dirname(__FILE__).DIRECTORY_SEPARATOR);
 define('ROOT_PATH', realpath(INCL_PATH . '..' . DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
-define('CLASS_PATH', ROOT_PATH . 'classes' . DIRECTORY_SEPARATOR);
+define('CLASS_PATH', INCL_PATH . 'classes' . DIRECTORY_SEPARATOR);
 define('CACHE_PATH', ROOT_PATH . 'cache' . DIRECTORY_SEPARATOR);
 define('ADMIN_PATH', ROOT_PATH . 'admin' . DIRECTORY_SEPARATOR);
 define('BLOCKS_PATH', ROOT_PATH . 'blocks' . DIRECTORY_SEPARATOR);
@@ -51,6 +51,6 @@ define('LANG_PATH', ROOT_PATH . 'language' . DIRECTORY_SEPARATOR);
 define('STYLE_PATH', ROOT_PATH . 'style' . DIRECTORY_SEPARATOR);
 
 #Do Not Edit...
-$tracker_rev = '.14';
+$tracker_rev = '.18';
     
 ?>
