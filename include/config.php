@@ -109,5 +109,20 @@ $GLOBALS["block_last10limit"] = "5";
 $GLOBALS["block_mostpoplimit"] = "5";
 $GLOBALS["clocktype"] = true;
 $GLOBALS["salting"] = "sUBaswupeduchErEm3wEbec8etraNECa";
+$GLOBALS['seed_bonus'] = 'no';
+$GLOBALS['freeleech'] = 'not';
+$GLOBALS['hit_and_run'] = 'no';
+$GLOBALS['seed_time'] = 'no';
+$GLOBALS['requests'] = 'no';
+$GLOBALS['duplicate_ips'] = 'no';
+$GLOBALS['block_links'] = 'no';
+$GLOBALS['warn_system'] = 'no';
+$GLOBALS['custom_title'] = 'no';
+$GLOBALS['timed_ranks'] = 'no';
+$GLOBALS['torrent_genre'] = 'no';
+$GLOBALS['users_on_forum'] = 'no';
+$GLOBALS['users_on_topic'] = 'no';
+$GLOBALS['image_link'] = 'no';
+$GLOBALS['nuked_requested'] = 'no';
 
 ?>
