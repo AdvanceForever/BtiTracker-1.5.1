@@ -22,6 +22,8 @@ if (isset($_GET['langue']))
 else
     $langue = 1;
 
+$url = $BASEURL . '/' . $url;
+
 dbconn();
 
 // guest don't need to change language!
