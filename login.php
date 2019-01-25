@@ -65,7 +65,7 @@ if (!user::$current || user::$current['uid'] == 1) {
             logincookie((int)$row['id'], $salted);
 
             if (isset($_GET['returnto']))
-                $url = security::html_safe(urldecode($_GET['returnto']));
+                $url = $BASEURL . '/' . security::html_safe(urldecode($_GET['returnto']));
             else
                 $url = 'index.php';
 
@@ -78,7 +78,7 @@ if (!user::$current || user::$current['uid'] == 1) {
     }
 } else {
     if (isset($_GET['returnto']))
-        $url = security::html_safe(urldecode($_GET['returnto']));
+        $url = $BASEURL . '/' . security::html_safe(urldecode($_GET['returnto']));
     else
         $url = 'index.php';
 
