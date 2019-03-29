@@ -428,7 +428,7 @@ function format_comment($text, $strip_html = true) {
     $s = str_replace(' ', ' ' . utf8::NBSP, $s);
 
     reset($smilies);
-    while (list($code, $url) = each($smilies)) {
+    foreach ($smilies as $code => $url) {
         $s = str_replace($code, "<img src='images/smilies/{$url}' border='0' alt='".security::html_safe($code)."' title='".security::html_safe($code)."' />", $s);
     }
 
