@@ -99,7 +99,7 @@ $Smileys = array(
 	':yawn:'	=> 'yawn.svg',
 );
 
-while ((list($code, $url) = each($Smileys))) {
+foreach ($Smileys as $code => $url) {
     if ($count % 3 == 0)
         print("\n<tr>");
 
