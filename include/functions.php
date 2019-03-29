@@ -634,7 +634,7 @@ function print_users() {
     } else
         $where = "";
     
-    $level = intval(0 + $_GET["level"]);
+    $level = 0 + (int)$_GET["level"];
     if ($level > 0) {
         $where .= " AND users.id_level = " . $level;
         if ($addparams != "")
