@@ -2369,8 +2369,8 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         MCached::connect();
         $stats = MCached::stats();
         foreach ($stats as $server => $stat) {
-	    $usertime = 0 + ''.$stat['rusage_user_seconds'].'.'.$stat['rusage_user_microseconds'];
-	    $systime = 0 + ''.$stat['rusage_system_seconds'].'.'.$stat['rusage_system_microseconds'];
+	    $usertime = 0 + (int)''.$stat['rusage_user_seconds'].'.'.$stat['rusage_user_microseconds'];
+	    $systime = 0 + (int)''.$stat['rusage_system_seconds'].'.'.$stat['rusage_system_microseconds'];
 	    print("<tr>
                <td valign='top'>Memcached Stats:</td>
                <td>Server: " . $server . " (" . $stat['version'] . " " . $stat['pointer_size'] . " bit)
