@@ -27,8 +27,8 @@ require($BASEPATH . '/include/defines.php');
 require($BASEPATH . '/include/config.php');
 require($BASEPATH . '/include/common.php');
 require($BASEPATH . '/include/ann_vars.php');
-require_once($BASEPATH . '/classes/class.Vars.php');
-require_once($BASEPATH . '/classes/class.Memcached.php');
+require_once($BASEPATH . '/include/classes/class.Vars.php');
+require_once($BASEPATH . '/include/classes/class.Memcached.php');
 
 error_reporting(0);
 
