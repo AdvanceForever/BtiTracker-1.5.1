@@ -382,7 +382,7 @@ function hash_pad($hash) {
 }
 
 function dbconn($do_clean = false) {
-    global $dbhost, $dbuser, $dbpass, $database, $HTTP_SERVER_VARS, $db;
+    global $dbhost, $dbuser, $dbpass, $database, $db;
     
     /*
      * Connect to Database.
