@@ -435,11 +435,9 @@ function cleandata() {
 }
 
 function updatedata() {
-    global $db;
-    
     require_once(INCL_PATH . 'getscrape.php');
-    
-    global $update_interval;
+
+    global $db, $update_interval;
     
     if ((0 + $update_interval) == 0)
         return;
