@@ -21,7 +21,7 @@ if (!user::$current || user::$current['admin_access'] == 'no' || user::$current[
     $res = $db->query("SELECT id, username, warns FROM users WHERE warns > '0' ORDER BY warns DESC " . $limit) or sqlerr();
     $num = $res->num_rows;
 
-    print("<table border='0' width='100%' cellspacing='2 cellpadding='0'>");
+    print("<table border='0' width='100%' cellspacing='2' cellpadding='0'>");
 
     //Per Page Listing Limitation Start
     if ($count > $perpage)
