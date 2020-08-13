@@ -161,7 +161,7 @@ if (!user::$current || user::$current["admin_access"] != "yes") {
         echo $BASEURL;
 ?>' size='40' /></td></tr>
             <tr><td class='header'>Tracker's Announce URLS (one url per row):</td><td class='lista'><textarea name='tracker_announceurl' rows='5' cols='40'><?php
-        echo implode($TRACKER_ANNOUNCEURLS, '\n');
+        echo implode('\n', $TRACKER_ANNOUNCEURLS);
 ?></textarea></td></tr>
             <tr><td class='header'>Tracker's email:</td><td class='lista'><input type='text' name='trackeremail' value='<?php
         echo $SITEEMAIL;
