@@ -351,10 +351,8 @@ if (function_exists('mhash') && (!function_exists('sha1')) && defined('MHASH_SHA
     }
 }
 
-function unesc($x) {
-    if (get_magic_quotes_gpc())
-        return stripslashes($x);
-    return $x;
+function unesc($x){
+    return stripslashes($x);
 }
 
 function mksecret($len = 20) {
