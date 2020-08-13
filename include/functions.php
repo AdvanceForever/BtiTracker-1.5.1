@@ -351,7 +351,7 @@ if (function_exists('mhash') && (!function_exists('sha1')) && defined('MHASH_SHA
     }
 }
 
-function unesc($x){
+function unesc($x) {
     return stripslashes($x);
 }
 
