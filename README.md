@@ -5,7 +5,7 @@ Installation
 
 1: Upload you files to server root.
 <br />
-2: Point your browse to http://www.yourdomain.ro and follow the installation steps (yourdomain.ro change it to your real domain). 
+2: Point your browse to http://www.yourdomain.com and follow the installation steps (yourdomain.ro change it to your real domain). 
 <br />
 3: Visit the Wiki on how to install it https://github.com/Yupy/BtiTracker-1.5.1/wiki
 
