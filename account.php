@@ -332,8 +332,8 @@ function tabella($action, $dati = array()) {
     <center>
     <p>
 	
-    <form name="utente" method="post" OnSubmit="return FormControl('<?php echo $action; ?>')" action="<?php echo security::esc_url($_SERVER['PHP_SELF']) . "?act=" . $action . "&returnto=" . urlencode($link); ?>">
-    <input type="hidden" name="act" value="<?php echo $action; ?>" />
+    <form name="utente" method="post" OnSubmit="return FormControl('<?php echo htmlentities($action, ENT_QUOTES); ?>')" action="<?php echo security::esc_url($_SERVER['PHP_SELF']) . "?act=" . $action . "&returnto=" . urlencode($link); ?>">
+    <input type="hidden" name="act" value="<?php echo htmlentities($action, ENT_QUOTES); ?>" />
     <input type="hidden" name="uid" value="<?php echo (int)$dati["id"]; ?>" />
     <input type="hidden" name="returnto" value="<?php echo urlencode($link); ?> "/>
     <input type="hidden" name="language" value="<?php echo $idlangue; ?> "/>
