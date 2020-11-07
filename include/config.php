@@ -76,7 +76,7 @@ $FORUMLINK="";
 // If you want to allow users to upload external torrents values true/false
 $EXTERNAL_TORRENTS=false;
 // Enable/disable GZIP compression, can save a lot of bandwidth
-$GZIP_ENABLED=true;
+$GZIP_ENABLED=false;
 // Show/Hide bottom page information on script's generation time and gzip
 $PRINT_DEBUG=true;
 // Enable/disable DHT network, add private flag to "info" in torrent
