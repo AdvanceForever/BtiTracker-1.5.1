@@ -124,8 +124,10 @@ function format_shout($text)
     $s = str_replace("  ", " &nbsp;", $s);
     
     reset($Smileys);
-    while (list($code, $url) = each($Smileys))
+
+    foreach ($Smileys as $code => $url) {
         $s = str_replace($code, "<img border='0' src='" . $BASEURL . "/images/smilies/" . $url . "'>", $s);
+    }
     
     return $s;
 }
