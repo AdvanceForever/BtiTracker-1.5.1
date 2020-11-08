@@ -3,29 +3,26 @@
 * BtiTracker v1.5.1 is a php tracker system for BitTorrent, easy to setup and configure.
 * This tracker is a frontend for DeHackEd's tracker, aka phpBTTracker (now heavely modified). 
 * Updated and Maintained by Yupy.
-* Copyright (C) 2004-2015 Btiteam.org
+* Copyright (C) 2004-2020 Btiteam.org
 */
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'functions.php');
 
 function login() {
-	global $PRIVATE_TRACKER, $tpl, $STYLEPATH;
+    global $PRIVATE_TRACKER, $smarty, $STYLEPATH;
 
-        if (!isset($user))
+    if (!isset($user)) {
 	    $user = '';
+    }
 
-	$var_returno = urlencode('index.php');
-	$tpl->assign('returno', $var_returno);
+	$smarty->assign('returno', urlencode('index.php'));
+	$smarty->assign('user', $user);
 
-	$var_user = $user;
-	$tpl->assign('user', $var_user);
+    #If...
+	$smarty->assign('private_tracker', $PRIVATE_TRACKER);
+    #End If...
 
-        #If...
-	$var_private_tracker = $PRIVATE_TRACKER;
-	$tpl->assign('private_tracker', $var_private_tracker);
-        #End If...
-
-	$login = $tpl->draw($STYLEPATH . '/tpl/login', $return_string = true);
-        echo $login;
+	$login = $smarty->display($STYLEPATH . '/tpl/login.tpl', $return_string = true);
+    echo $login;
 }
 
 dbconn();
