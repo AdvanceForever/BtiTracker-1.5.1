@@ -24,13 +24,13 @@
 <tr>
     <td>Username&nbsp;</td>
     <td colspan='2'>
-       <input type='text' name='uid' id='uid' value='{$user}' required='required' size='40' maxlength='40' pattern='[A-Za-z0-9_?]{1,20}' autofocus='autofocus' placeholder='Username' />
+       <input type='text' name='uid' id='uid' value='{$user}' required='required' size='40' maxlength='40' autofocus='autofocus' placeholder='Username' />
     </td>
 </tr>
 <tr>
     <td>Password&nbsp;</td>
     <td colspan='2'>
-       <input type='password' name='pwd' id='pwd' required='required' size='40' maxlength='100' pattern='.{6,100}' placeholder='Password' />
+       <input type='password' name='pwd' id='pwd' required='required' size='40' maxlength='100' placeholder='Password' />
     </td>
 </tr>
 <tr>
