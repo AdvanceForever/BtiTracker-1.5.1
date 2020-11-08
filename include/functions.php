@@ -872,15 +872,13 @@ function gmtime() {
 }
 
 function sqlerr($file = '', $line = '') {
-    global $db, $tpl;
+    global $db, $smarty;
 
-    $lang_error = ERR_SQL_ERR;
-    $tpl->assign('lang_error', $lang_error);
+    $smarty->assign('lang_error', ERR_SQL_ERR);
 
-    $display_error = $db->error . ($file != '' && $line != '' ? "<p>in " . $file . ", line " . $line . "</p>" : "");
-    $tpl->assign('display_error', $display_error);
+    $smarty->assign('display_error', $db->error . ($file != '' && $line != '' ? "<p>in " . $file . ", line " . $line . "</p>" : ""));
 
-    $sql_error = $tpl->draw('style/base/tpl/sql_error', $return_string = true);
+    $sql_error = $smarty->display('style/base/tpl/sql_error.tpl', $return_string = true);
     echo $sql_error;
 
     die;
