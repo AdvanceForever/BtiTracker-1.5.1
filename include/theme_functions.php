@@ -260,13 +260,13 @@ function format_quotes($s) {
 
         //-- Find Last [quote] Before First [/quote] --//
         //-- Note That There Is No Check For Correct Syntax --//
-        $open = strripos(utf8::substr($s, 0, $close), "[quote");
+        $open = strripos(substr($s, 0, $close), "[quote");
 
         if ($open === false) {
             return $s;
         }
 
-        $quote = utf8::substr($s, $open, $close - $open + 8);
+        $quote = substr($s, $open, $close - $open + 8);
 
         //-- [quote]Text[/quote] --//
         $quote = preg_replace("/\[quote\]\s*((\s|.)+?)\s*\[\/quote\]\s*/i", "<span class='sub'><strong>Quote:</strong></span><table class='main' border='1' cellspacing='0' cellpadding='10'><tr><td style='border: 1px black dotted'>\\1</td></tr></table><br />", $quote);
@@ -274,11 +274,10 @@ function format_quotes($s) {
         //-- [quote=Author]Text[/quote] --//
         $quote = preg_replace("/\[quote=(.+?)\]\s*((\s|.)+?)\s*\[\/quote\]\s*/i", "<span class='sub'><strong>\\1 wrote:</strong></span><table class='main' border='1' cellspacing='0' cellpadding='10'><tr><td style='border: 1px black dotted'>\\2</td></tr></table><br />", $quote);
 
-        $s = utf8::substr($s, 0, $open).$quote.utf8::substr($s, $close + 8);
+        $s = substr($s, 0, $open).$quote.substr($s, $close + 8);
     }
     return $s;
 }
-
 
 function format_comment($text, $strip_html = true) {
     global $smilies;
