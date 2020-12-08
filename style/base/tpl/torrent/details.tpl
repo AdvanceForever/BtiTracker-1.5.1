@@ -104,7 +104,7 @@
 
 {if $has_url}
 <tr>
-   <td align='right' class='header' valign='top'><a name='#expand' href='#expand' onclick=\"javascript:ShowHide('files', 'msgfile');\">Show/Hide Files: </td>
+   <td align='right' class='header' valign='top'><a name='#expand' href='#expand' onclick="javascript:ShowHide('files', 'msgfile');">Show/Hide Files: </td>
    <td align='left' class='lista'>
       <div name='files' style='display:none' id='files'>
       <table class='lista'>
