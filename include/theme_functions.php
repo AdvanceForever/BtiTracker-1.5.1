@@ -423,10 +423,6 @@ function format_comment($text, $strip_html = true) {
         $s = preg_replace("/\[nfo\](.+?)\[\/nfo\]/i", "<tt><span style=\"white-space: nowrap;\"><font face='MS Linedraw' size='2' style='font-size: 10pt; line-height: "."10pt'>\\1</font></span></tt>", $s);
     }
 
-    //-- Maintain Spacing --//
-    $s = str_replace(utf8::NBSP, ' ', $s);
-    $s = str_replace(' ', ' ' . utf8::NBSP, $s);
-
     reset($smilies);
     foreach ($smilies as $code => $url) {
         $s = str_replace($code, "<img src='images/smilies/{$url}' border='0' alt='".security::html_safe($code)."' title='".security::html_safe($code)."' />", $s);
