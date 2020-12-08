@@ -422,6 +422,9 @@ function format_comment($text, $strip_html = true) {
     {
         $s = preg_replace("/\[nfo\](.+?)\[\/nfo\]/i", "<tt><span style=\"white-space: nowrap;\"><font face='MS Linedraw' size='2' style='font-size: 10pt; line-height: "."10pt'>\\1</font></span></tt>", $s);
     }
+	
+    // Maintain spacing
+    $s = str_replace('  ', ' &nbsp;', $s);
 
     reset($smilies);
     foreach ($smilies as $code => $url) {
